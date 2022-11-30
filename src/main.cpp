@@ -74,46 +74,24 @@ double compute_alti(double px, double py, double tx0, double ty0, double tz0, do
 
 void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_y, double &max_x, double &max_y)
 {
-    double second_min_x = 1e+300, second_min_y = 1e+300, second_max_x = 0, second_max_y = 0;
     min_x = 1e+300, min_y = 1e+300, max_x = 0, max_y = 0;
     for (int i = 0; i < coords.size(); i += 2)
     {
         if (coords[i] <= min_x)
-        {
-            second_min_x = min_x;
             min_x = coords[i];
-        }
-        else if (coords[i] < second_min_x)
-            second_min_x = coords[i];
 
         if (coords[i] >= max_x)
-        {
-            second_max_x = max_x;
             max_x = coords[i];
-        }
-        else if (coords[i] > second_max_x)
-            second_max_x = coords[i];
     }
+
     for (int i = 1; i < coords.size(); i += 2)
     {
         if (coords[i] <= min_y)
-        {
-            second_min_y = min_y;
             min_y = coords[i];
-        }
-        else if (coords[i] < second_min_y)
-            second_min_y = coords[i];
 
         if (coords[i] >= max_y)
-        {
-            second_max_y = max_y;
             max_y = coords[i];
-        }
-        else if (coords[i] > second_max_y)
-            second_max_y = coords[i];
     }
-    min_x = second_min_x, min_y = second_min_y;
-    max_x = second_max_x, max_y = second_max_y;
 }
 
 void draw_map(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
@@ -198,7 +176,7 @@ int main()
          << "(" << cartesian_coord.xy.x << "," << cartesian_coord.xy.y << ")" << endl;
     */
 
-    string filename = "../data/guerledan.txt";
+    string filename = "../data/rade.txt";
     ifstream f_data(filename);
 
     if (!f_data.is_open())
