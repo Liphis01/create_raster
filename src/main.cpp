@@ -6,6 +6,8 @@
 
 using namespace std;
 
+string filename = "rade.txt";
+
 void print_triangle(delaunator::Delaunator &d, int i)
 {
     printf(
@@ -96,9 +98,11 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
 
 void draw_map(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
 {
-    string filename = "../data/generated/map_guerledan.pgm";
-    int backgroundColor = 50;
+    string map = filename.substr(8, filename.size() - 12);
+    string filename = "../data/generated/map_" + map + ".pgm";
     ofstream f(filename);
+    
+    int backgroundColor = 50;
 
     if (!f.is_open())
         cout << "Erreur d'ouverture de " << filename << endl;
@@ -176,7 +180,7 @@ int main()
          << "(" << cartesian_coord.xy.x << "," << cartesian_coord.xy.y << ")" << endl;
     */
 
-    string filename = "../data/rade.txt";
+    filename = "../data/" + filename;
     ifstream f_data(filename);
 
     if (!f_data.is_open())
