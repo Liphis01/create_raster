@@ -3,10 +3,11 @@
 #include <proj.h>
 #include <delaunator.hpp>
 #include <map>
+#include "HSL.cpp"
 
 using namespace std;
 
-string filename = "rade.txt";
+string filename = "guerledan.txt";
 
 void print_triangle(delaunator::Delaunator &d, int i)
 {
@@ -96,10 +97,10 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
     }
 }
 
-void draw_map(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
+void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
 {
-    string map = filename.substr(8, filename.size() - 12);
-    string filename = "../data/generated/map_" + map + ".pgm";
+    string raster = filename.substr(8, filename.size() - 12);
+    string filename = "../data/generated/raster_" + raster + ".ppm";
     ofstream f(filename);
     
     int backgroundColor = 50;
@@ -110,7 +111,7 @@ void draw_map(delaunator::Delaunator &d, map<pair<double, double>, double> &alti
     else
     {
         // File characteristics
-        f << "P2" << endl
+        f << "P3" << endl
           << w << " " << h << endl
           << 255 << endl;
 
@@ -128,7 +129,9 @@ void draw_map(delaunator::Delaunator &d, map<pair<double, double>, double> &alti
                 int i = find_triangle(x, y, d);
                 if (i == -1)
                 {
-                    f << backgroundColor << " ";
+                    f << backgroundColor << " "
+                      << backgroundColor << " "
+                      << backgroundColor << " ";
                     continue;
                 }
 
@@ -145,7 +148,13 @@ void draw_map(delaunator::Delaunator &d, map<pair<double, double>, double> &alti
                                         tx0, ty0, tz0, 
                                         tx1, ty1, tz1, 
                                         tx2, ty2, tz2);
-                f << (int)((z - min_z)*255/(max_z - min_z)) << " ";
+                int hueValue = (z - min_z)*360/(max_z - min_z);
+                
+                int r, g, b;
+                HSLToRGB(hueValue, .5f, .5f, r, g, b);
+                f << r << " "
+                  << g << " "
+                  << b << " ";
             }
             f << endl;
         }
@@ -203,7 +212,7 @@ int main()
         int i = find_triangle(x, y, d);
         printf("%d\n", i); */
         // print_triangle(d, i);
-        draw_map(d, altitudes, w, h);
+        draw_raster(d, altitudes, w, h);
     }
 
     f_data.close();

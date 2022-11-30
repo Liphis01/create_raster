@@ -57,7 +57,8 @@ static void RGBToHSL(int R, int G, int B, int &H, int &S, float &L)
 	return;
 }
 
-static float HueToRGB(float v1, float v2, float vH) {
+static float HueToRGB(float v1, float v2, float vH)
+{
 	if (vH < 0)
 		vH += 1;
 
@@ -76,14 +77,11 @@ static float HueToRGB(float v1, float v2, float vH) {
 	return v1;
 }
 
-static void HSLToRGB(int H, int S, float L, int &R, int &G, int &B) {
-	unsigned char r = 0;
-	unsigned char g = 0;
-	unsigned char b = 0;
-
+static void HSLToRGB(int H, float S, float L, int &r, int &g, int &b)
+{
 	if (S == 0)
 	{
-		r = g = b = (unsigned char)(L * 255);
+		r = g = b = (int)(L * 255);
 	}
 	else
 	{
@@ -93,9 +91,9 @@ static void HSLToRGB(int H, int S, float L, int &R, int &G, int &B) {
 		v2 = (L < 0.5) ? (L * (1 + S)) : ((L + S) - (L * S));
 		v1 = 2 * L - v2;
 
-		r = (unsigned char)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
-		g = (unsigned char)(255 * HueToRGB(v1, v2, hue));
-		b = (unsigned char)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
+		r = (int)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
+		g = (int)(255 * HueToRGB(v1, v2, hue));
+		b = (int)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
 	}
 
 	return;
