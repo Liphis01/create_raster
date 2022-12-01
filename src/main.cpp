@@ -7,7 +7,8 @@
 
 using namespace std;
 
-string filename = "rade.txt";
+// string filename = "rade.txt";
+string filename = "guerledan.txt";
 
 void print_triangle(delaunator::Delaunator &d, int i)
 {
@@ -27,7 +28,7 @@ void add_coords(ifstream &stream, PJ *P, vector<double> &coords, map<pair<double
     PJ_COORD geo_coord, cartesian_coord;
     double alt;
 
-    stream >> geo_coord.lpzt.lam >> geo_coord.lpzt.phi >> alt;
+    stream >> geo_coord.lpzt.phi >> geo_coord.lpzt.lam >> alt;
     geo_coord.lpzt.z = 0.;
 
     cartesian_coord = proj_trans(P, PJ_FWD, geo_coord);
@@ -103,7 +104,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
     string filename = "../data/generated/raster_" + raster + ".ppm";
     ofstream f(filename);
 
-    int backgroundColor = 50;
+    int backgroundColor = 0;
 
     if (!f.is_open())
         cout << "Erreur d'ouverture de " << filename << endl;
@@ -127,11 +128,11 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
         // f << min_x << " " << min_y << " " << max_x << " " << max_y << endl;
         double x_step = (max_x - min_x) / w, y_step = (max_y - min_y) / h;
 
-        double x = min_x;
-        double y;
+        double x;
+        double y = max_y;
         for (int i = 0; i < w; i++)
         {
-            y = min_y;
+            x = min_x;
             for (int j = 0; j < h; j++)
             {
                 int idx_triangle = find_triangle(x, y, d);
@@ -140,7 +141,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                     f << backgroundColor << " "
                       << backgroundColor << " "
                       << backgroundColor << " ";
-                    y += y_step;
+                    x += x_step;
                     continue;
                 }
 
@@ -165,10 +166,10 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                   << g << " "
                   << b << " ";
 
-                y = y + y_step;
+                x += x_step;
             }
             f << endl;
-            x = x + x_step;
+            y -= y_step;
         }
     }
 
