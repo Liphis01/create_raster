@@ -4,11 +4,12 @@
 #include <delaunator.hpp>
 #include <map>
 #include "HSL.cpp"
+#define M_PI 3.14159265358979323846 /* pi */
 
 using namespace std;
 
-// string filename = "rade.txt";
-string filename = "guerledan.txt";
+string filename = "rade.txt";
+// string filename = "guerledan.txt";
 
 void print_triangle(delaunator::Delaunator &d, int i)
 {
@@ -78,7 +79,7 @@ double compute_alti(double px, double py, double tx0, double ty0, double tz0, do
 
 void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_y, double &max_x, double &max_y)
 {
-    min_x = 1e+300, min_y = 1e+300, max_x = 0, max_y = 0;
+    min_x = INFINITY, min_y = INFINITY, max_x = 0, max_y = 0;
     for (int i = 0; i < coords.size(); i += 2)
     {
         if (coords[i] <= min_x)
@@ -96,6 +97,20 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
         if (coords[i] >= max_y)
             max_y = coords[i];
     }
+}
+
+float shadowing(float azimut_deg = 315., float altitude_deg = 45.)
+{
+    float zenith_deg = 90 - altitude_deg;
+    float zenith_rad = zenith_deg * M_PI / 180;
+
+    float azimuth_math = fmod(360 - azimut_deg + 90, 360);
+    float azimuth_rad = azimuth_math * M_PI / 180;
+
+    float slope_rad = 0.5;
+    float aspect_rad = 0.5;
+
+    return (cos(zenith_rad) * cos(slope_rad)) + (sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad));
 }
 
 void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
@@ -161,7 +176,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                HSLToRGB(hueValue, .5f, .5f, r, g, b);
+                HSLToRGB(hueValue, .5f, shadowing(), r, g, b);
                 f << r << " "
                   << g << " "
                   << b << " ";
