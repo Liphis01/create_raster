@@ -7,7 +7,7 @@
 
 using namespace std;
 
-string filename = "guerledan.txt";
+string filename = "rade.txt";
 
 void print_triangle(delaunator::Delaunator &d, int i)
 {
@@ -102,7 +102,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
     string raster = filename.substr(8, filename.size() - 12);
     string filename = "../data/generated/raster_" + raster + ".ppm";
     ofstream f(filename);
-    
+
     int backgroundColor = 50;
 
     if (!f.is_open())
@@ -117,53 +117,58 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
 
         double min_x, min_y, max_x, max_y;
         get_xy_boundaries(d.coords, min_x, min_y, max_x, max_y);
-        double min_z = min_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y) {return x.second < y.second;}) -> second;
-        double max_z = max_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y) {return x.second < y.second;}) -> second;
+        double min_z = min_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y)
+                                   { return x.second < y.second; })
+                           ->second;
+        double max_z = max_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y)
+                                   { return x.second < y.second; })
+                           ->second;
 
         // f << min_x << " " << min_y << " " << max_x << " " << max_y << endl;
         double x_step = (max_x - min_x) / w, y_step = (max_y - min_y) / h;
 
         double x = min_x;
+        double y;
         for (int i = 0; i < w; i++)
         {
-            double y = min_y;
+            y = min_y;
             for (int j = 0; j < h; j++)
             {
-                cout << y << endl;
                 int idx_triangle = find_triangle(x, y, d);
                 if (idx_triangle == -1)
                 {
                     f << backgroundColor << " "
                       << backgroundColor << " "
                       << backgroundColor << " ";
+                    y += y_step;
                     continue;
                 }
 
                 double tx0 = d.coords[2 * d.triangles[idx_triangle]];
                 double ty0 = d.coords[2 * d.triangles[idx_triangle] + 1];
-                double tz0 = altitudes.find(make_pair(tx0, ty0)) -> second;
+                double tz0 = altitudes.find(make_pair(tx0, ty0))->second;
                 double tx1 = d.coords[2 * d.triangles[idx_triangle + 1]];
                 double ty1 = d.coords[2 * d.triangles[idx_triangle + 1] + 1];
-                double tz1 = altitudes.find(make_pair(tx1, ty1)) -> second;
+                double tz1 = altitudes.find(make_pair(tx1, ty1))->second;
                 double tx2 = d.coords[2 * d.triangles[idx_triangle + 2]];
                 double ty2 = d.coords[2 * d.triangles[idx_triangle + 2] + 1];
-                double tz2 = altitudes.find(make_pair(tx2, ty2)) -> second;
-                double z = compute_alti(x, y, 
-                                        tx0, ty0, tz0, 
-                                        tx1, ty1, tz1, 
+                double tz2 = altitudes.find(make_pair(tx2, ty2))->second;
+                double z = compute_alti(x, y,
+                                        tx0, ty0, tz0,
+                                        tx1, ty1, tz1,
                                         tx2, ty2, tz2);
-                int hueValue = (z - min_z)*360/(max_z - min_z);
-                
+                int hueValue = (z - min_z) * 360 / (max_z - min_z);
+
                 int r, g, b;
                 HSLToRGB(hueValue, .5f, .5f, r, g, b);
                 f << r << " "
                   << g << " "
                   << b << " ";
-                
-                y += y_step;
+
+                y = y + y_step;
             }
             f << endl;
-            y += x_step;
+            x = x + x_step;
         }
     }
 
