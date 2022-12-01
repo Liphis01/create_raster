@@ -122,12 +122,16 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
 
         // f << min_x << " " << min_y << " " << max_x << " " << max_y << endl;
         double x_step = (max_x - min_x) / w, y_step = (max_y - min_y) / h;
-        for (double x = min_x; x < max_x; x += x_step)
+
+        double x = min_x;
+        for (int i = 0; i < w; i++)
         {
-            for (double y = min_y; y < max_y; y += y_step)
+            double y = min_y;
+            for (int j = 0; j < h; j++)
             {
-                int i = find_triangle(x, y, d);
-                if (i == -1)
+                cout << y << endl;
+                int idx_triangle = find_triangle(x, y, d);
+                if (idx_triangle == -1)
                 {
                     f << backgroundColor << " "
                       << backgroundColor << " "
@@ -135,14 +139,14 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                     continue;
                 }
 
-                double tx0 = d.coords[2 * d.triangles[i]];
-                double ty0 = d.coords[2 * d.triangles[i] + 1];
+                double tx0 = d.coords[2 * d.triangles[idx_triangle]];
+                double ty0 = d.coords[2 * d.triangles[idx_triangle] + 1];
                 double tz0 = altitudes.find(make_pair(tx0, ty0)) -> second;
-                double tx1 = d.coords[2 * d.triangles[i + 1]];
-                double ty1 = d.coords[2 * d.triangles[i + 1] + 1];
+                double tx1 = d.coords[2 * d.triangles[idx_triangle + 1]];
+                double ty1 = d.coords[2 * d.triangles[idx_triangle + 1] + 1];
                 double tz1 = altitudes.find(make_pair(tx1, ty1)) -> second;
-                double tx2 = d.coords[2 * d.triangles[i + 2]];
-                double ty2 = d.coords[2 * d.triangles[i + 2] + 1];
+                double tx2 = d.coords[2 * d.triangles[idx_triangle + 2]];
+                double ty2 = d.coords[2 * d.triangles[idx_triangle + 2] + 1];
                 double tz2 = altitudes.find(make_pair(tx2, ty2)) -> second;
                 double z = compute_alti(x, y, 
                                         tx0, ty0, tz0, 
@@ -155,8 +159,11 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 f << r << " "
                   << g << " "
                   << b << " ";
+                
+                y += y_step;
             }
             f << endl;
+            y += x_step;
         }
     }
 
