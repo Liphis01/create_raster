@@ -99,18 +99,36 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
     }
 }
 
-float shadowing(float azimut_deg = 315., float altitude_deg = 45.)
+float shadowing(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, float azimut_deg = 315., float altitude_deg = 20.)
 {
     float zenith_deg = 90 - altitude_deg;
     float zenith_rad = zenith_deg * M_PI / 180;
+    // cout << zenith_rad << endl;
 
     float azimuth_math = fmod(360 - azimut_deg + 90, 360);
     float azimuth_rad = azimuth_math * M_PI / 180;
+    // cout << azimuth_rad << endl;
 
-    float slope_rad = 0.5;
-    float aspect_rad = 0.5;
+    double t0, t1;
+    if (y1 == y2)
+        t0 = 0;
+    else
+        t0 = (y0 - y2) / (y1 - y2);
+    if (x1 == x2)
+        t1 = 0;
+    else
+        t1 = (x0 - x2) / (x1 - x2);
+    // cout << t0 << " " << t1 << endl;
 
-    return (cos(zenith_rad) * cos(slope_rad)) + (sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad));
+    double dz_dx = (z2 + t0 * (z1 - z2) - z0) / (x2 + t0 * (x1 - x2) - x0);
+    double dz_dy = (z2 + t1 * (z1 - z2) - z0) / (y2 + t1 * (y1 - y2) - y0);
+    // cout << dz_dx << " " << dz_dy << endl;
+
+    float slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
+    float aspect_rad = fmod(atan2(dz_dy, -dz_dx), 2 * M_PI);
+    // cout << slope_rad << " " << aspect_rad << endl;
+    // cout << cos(zenith_rad) * cos(slope_rad) << " " << sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad) << endl << endl;
+    return cos(zenith_rad) * cos(slope_rad) + sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad);
 }
 
 void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
@@ -156,6 +174,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                     f << backgroundColor << " "
                       << backgroundColor << " "
                       << backgroundColor << " ";
+
                     x += x_step;
                     continue;
                 }
@@ -176,10 +195,12 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                HSLToRGB(hueValue, .5f, shadowing(), r, g, b);
-                f << r << " "
-                  << g << " "
-                  << b << " ";
+                // float lum = shadowing(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2);
+                // cout << lum << endl;
+                HSLToRGB(hueValue, .5f, .5, r, g, b);
+                f << max(r, 0) << " "
+                  << max(g, 0) << " "
+                  << max(b, 0) << " ";
 
                 x += x_step;
             }
@@ -225,7 +246,7 @@ int main()
 
     else
     {
-        int w = 50, h = 50; // Taille de l'image
+        int w = 150, h = 150; // Taille de l'image
         vector<double> coords;
         map<pair<double, double>, double> altitudes;
         while (!f_data.eof())
