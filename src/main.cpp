@@ -1,15 +1,17 @@
 #include <iostream>
 #include <fstream>
+#include <math.h>
 #include <proj.h>
 #include <delaunator.hpp>
 #include <map>
 #include "HSL.cpp"
+
 #define M_PI 3.14159265358979323846 /* pi */
 
 using namespace std;
 
-string filename = "rade.txt";
-// string filename = "guerledan.txt";
+// string filename = "rade.txt";
+string filename = "guerledan.txt";
 
 void print_triangle(delaunator::Delaunator &d, int i)
 {
@@ -145,7 +147,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
     else
     {
         // File characteristics
-        f << "P3" << endl
+        f << "P2" << endl
           << w << " " << h << endl
           << 255 << endl;
 
@@ -171,9 +173,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int idx_triangle = find_triangle(x, y, d);
                 if (idx_triangle == -1)
                 {
-                    f << backgroundColor << " "
-                      << backgroundColor << " "
-                      << backgroundColor << " ";
+                    f << backgroundColor << " ";
 
                     x += x_step;
                     continue;
@@ -195,12 +195,10 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                // float lum = shadowing(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2);
+                float lum = shadowing(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2);
                 // cout << lum << endl;
-                HSLToRGB(hueValue, .5f, .5, r, g, b);
-                f << max(r, 0) << " "
-                  << max(g, 0) << " "
-                  << max(b, 0) << " ";
+                HSLToRGB(hueValue, .5f, lum, r, g, b);
+                f << max((int)(lum*255), 0) << " ";
 
                 x += x_step;
             }
@@ -246,7 +244,7 @@ int main()
 
     else
     {
-        int w = 150, h = 150; // Taille de l'image
+        int w = 40, h = 40; // Taille de l'image
         vector<double> coords;
         map<pair<double, double>, double> altitudes;
         while (!f_data.eof())
