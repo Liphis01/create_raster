@@ -7,9 +7,6 @@
 
 using namespace std;
 
-// string filename = "rade.txt";
-string filename = "guerledan.txt";
-
 void print_triangle(delaunator::Delaunator &d, int i)
 {
     printf(
@@ -98,16 +95,16 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
     }
 }
 
-void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h)
+void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h, string filename)
 {
     string raster = filename.substr(8, filename.size() - 12);
-    string filename = "../data/generated/raster_" + raster + ".ppm";
-    ofstream f(filename);
+    string outputFilename = "../data/generated/raster_" + raster + ".ppm";
+    ofstream f(outputFilename);
 
     int backgroundColor = 0;
 
     if (!f.is_open())
-        cout << "Erreur d'ouverture de " << filename << endl;
+        cout << "Erreur d'ouverture de " << outputFilename << endl;
 
     else
     {
@@ -176,7 +173,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
     f.close();
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
     // Initialisation des référentiels de coordonnées :
     PJ *P = proj_create_crs_to_crs(
@@ -194,15 +191,14 @@ int main()
     geo_coord.lpzt.phi = 48.41908;   // latitude
     geo_coord.lpzt.z = 0.;           // le z dans le référentiel ellipsoidale n'est pas nécessaire pour la projection
 
-    /*
-    // Projection géographique
-    cartesian_coord = proj_trans(P, PJ_FWD, geo_coord);
-    cout << "(" << geo_coord.lpzt.lam << "," << geo_coord.lpzt.phi << ")"
-         << " -> "
-         << "(" << cartesian_coord.xy.x << "," << cartesian_coord.xy.y << ")" << endl;
-    */
+    if (argc < 2)
+    {
+        printf("No data file specified.\n");
+        return -1;
+    }
 
-    filename = "../data/" + filename;
+    string filename = "../data/";
+    cout << filename << endl;
     ifstream f_data(filename);
 
     if (!f_data.is_open())
@@ -210,6 +206,7 @@ int main()
 
     else
     {
+        printf("ok");
         int w = 50, h = 50; // Taille de l'image
         vector<double> coords;
         map<pair<double, double>, double> altitudes;
@@ -225,7 +222,7 @@ int main()
         int i = find_triangle(x, y, d);
         printf("%d\n", i); */
         // print_triangle(d, i);
-        draw_raster(d, altitudes, w, h);
+        draw_raster(d, altitudes, w, h, filename);
     }
 
     f_data.close();
