@@ -191,9 +191,9 @@ int main(int argc, char const *argv[])
     geo_coord.lpzt.phi = 48.41908;   // latitude
     geo_coord.lpzt.z = 0.;           // le z dans le référentiel ellipsoidale n'est pas nécessaire pour la projection
 
-    if (argc < 2)
+    if (argc < 3)
     {
-        printf("No data file specified\n");
+        printf("Not enough arguments.\n");
         return -1;
     }
 
@@ -206,8 +206,7 @@ int main(int argc, char const *argv[])
 
     else
     {
-        printf("ok");
-        int w = 50, h = 50; // Taille de l'image
+        int w = stoi(argv[2]), h = stoi(argv[2]); // Taille de l'image
         vector<double> coords;
         map<pair<double, double>, double> altitudes;
         while (!f_data.eof())
