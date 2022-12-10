@@ -11,7 +11,7 @@
 using namespace std;
 
 // string filename = "rade.txt";
-string filename = "guerledan.txt";
+string filename = "rade.txt";
 
 void print_triangle(delaunator::Delaunator &d, int i)
 {
@@ -79,6 +79,18 @@ double compute_alti(double px, double py, double tx0, double ty0, double tz0, do
     return tz0 + ((tx0 - px) * cx + (ty0 - py) * cy) / cz;
 }
 
+void compute_derivatives(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double &dz_dx, double &dz_dy)
+{
+    double cx = (y1 - y0) * (z2 - z1) - (z1 - z0) * (y2 - y1);
+    double cy = (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1);
+    double cz = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+    dz_dx = - cx / cz;
+    dz_dy = - cy / cz;
+    // double denom =   (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+    // dz_dx =   (z1 - z0) * (y2 - y1) - (y1 - y0) * (z2 - z1) / denom; 
+    // dz_dy = - (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1) / denom;
+}
+
 void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_y, double &max_x, double &max_y)
 {
     min_x = INFINITY, min_y = INFINITY, max_x = 0, max_y = 0;
@@ -101,35 +113,21 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
     }
 }
 
-float shadowing(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, float azimut_deg = 315., float altitude_deg = 20.)
+double shadowing(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double azimut_deg = 315., double altitude_deg = 45.)
 {
-    float zenith_deg = 90 - altitude_deg;
-    float zenith_rad = zenith_deg * M_PI / 180;
-    // cout << zenith_rad << endl;
+    double zenith_deg = 90 - altitude_deg;
+    double zenith_rad = zenith_deg * M_PI / 180;
 
-    float azimuth_math = fmod(360 - azimut_deg + 90, 360);
-    float azimuth_rad = azimuth_math * M_PI / 180;
-    // cout << azimuth_rad << endl;
+    double azimuth_math = fmod(360 - azimut_deg + 90, 360);
+    double azimuth_rad = azimuth_math * M_PI / 180;
 
-    double t0, t1;
-    if (y1 == y2)
-        t0 = 0;
-    else
-        t0 = (y0 - y2) / (y1 - y2);
-    if (x1 == x2)
-        t1 = 0;
-    else
-        t1 = (x0 - x2) / (x1 - x2);
-    // cout << t0 << " " << t1 << endl;
+    double dz_dx, dz_dy;
+    compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
 
-    double dz_dx = (z2 + t0 * (z1 - z2) - z0) / (x2 + t0 * (x1 - x2) - x0);
-    double dz_dy = (z2 + t1 * (z1 - z2) - z0) / (y2 + t1 * (y1 - y2) - y0);
-    // cout << dz_dx << " " << dz_dy << endl;
+    double slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
+    double aspect_rad = fmod(atan2(dz_dy, -dz_dx) + 2 * M_PI, 2 * M_PI);
 
-    float slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
-    float aspect_rad = fmod(atan2(dz_dy, -dz_dx), 2 * M_PI);
-    // cout << slope_rad << " " << aspect_rad << endl;
-    // cout << cos(zenith_rad) * cos(slope_rad) << " " << sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad) << endl << endl;
+    // printf("%f, %f, %f, %f, %f\n", cos(zenith_rad), cos(slope_rad), sin(zenith_rad), sin(slope_rad), cos(azimuth_rad - aspect_rad));
     return cos(zenith_rad) * cos(slope_rad) + sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad);
 }
 
@@ -147,7 +145,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
     else
     {
         // File characteristics
-        f << "P2" << endl
+        f << "P3" << endl
           << w << " " << h << endl
           << 255 << endl;
 
@@ -173,8 +171,9 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int idx_triangle = find_triangle(x, y, d);
                 if (idx_triangle == -1)
                 {
-                    f << backgroundColor << " ";
-
+                    f << backgroundColor << " "
+                      << backgroundColor << " "
+                      << backgroundColor << " ";
                     x += x_step;
                     continue;
                 }
@@ -195,10 +194,16 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                float lum = shadowing(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2);
-                // cout << lum << endl;
+                double lum = shadowing(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2, 315, 20);
                 HSLToRGB(hueValue, .5f, lum, r, g, b);
-                f << max((int)(lum*255), 0) << " ";
+                if (r < 0 || g < 0 || b < 0)
+                {
+                    printf("rgb : %d, %d, %d\nhue, lum : %d, %f\n", r, g, b, hueValue, lum);
+                    printf("compute_derivatives(%f, %f, %f, %f, %f, %f, %f, %f, %f, dz_dx, dz_dy);\n\n", tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2);
+                }
+                f << max(r, 0) << " "
+                  << max(g, 0) << " "
+                  << max(b, 0) << " ";
 
                 x += x_step;
             }
@@ -212,6 +217,10 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
 
 int main()
 {
+    double dz_dx, dz_dy;
+    compute_derivatives(150997.000024, 6826137.999733, 21.544000, 150898.000000, 6826146.000102, 17.769000, 150998.000363, 6826138.000415, 21.536000, dz_dx, dz_dy);
+    cout << dz_dx << " " << dz_dy << endl;
+    cout << shadowing(150997.000024, 6826137.999733, 21.544000, 150898.000000, 6826146.000102, 17.769000, 150998.000363, 6826138.000415, 21.536000, 315, 20) << endl << endl;
     // Initialisation des référentiels de coordonnées :
     PJ *P = proj_create_crs_to_crs(
         PJ_DEFAULT_CTX,
@@ -244,7 +253,7 @@ int main()
 
     else
     {
-        int w = 40, h = 40; // Taille de l'image
+        int w = 100, h = 100; // Taille de l'image
         vector<double> coords;
         map<pair<double, double>, double> altitudes;
         while (!f_data.eof())
