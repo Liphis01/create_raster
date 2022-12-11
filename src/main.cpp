@@ -113,7 +113,7 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
     }
 }
 
-double shadowing(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double azimut_deg = 315., double altitude_deg = 45.)
+double hill_shading(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double azimut_deg = 315., double altitude_deg = 45.)
 {
     double zenith_deg = 90 - altitude_deg;
     double zenith_rad = zenith_deg * M_PI / 180;
@@ -122,7 +122,14 @@ double shadowing(double x0, double y0, double z0, double x1, double y1, double z
     double azimuth_rad = azimuth_math * M_PI / 180;
 
     double dz_dx, dz_dy;
-    compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
+    double neighs[9]; // 9 neighbor cells starting with vertex (x0, y0, z0)
+    for (int i = 0; i < 9; i++)
+    {
+        neighs[i] = compute_alti(x0 + i%3, y0 + i/3, x0, y0, z0, x1, y1, z1, x2, y2, z2);
+    }
+    // compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
+    dz_dx = ((neighs[2] + 2*neighs[5] + neighs[8]) - (neighs[0] + 2*neighs[3] + neighs[6])) / 8;
+    dz_dx = ((neighs[6] + 2*neighs[7] + neighs[8]) - (neighs[0] + 2*neighs[1] + neighs[2])) / 8;
 
     double slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
     double aspect_rad = fmod(atan2(dz_dy, -dz_dx) + 2 * M_PI, 2 * M_PI);
@@ -194,7 +201,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                double lum = shadowing(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2, 315, 20);
+                double lum = hill_shading(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2, 315, 20);
                 HSLToRGB(hueValue, .5f, lum, r, g, b);
                 if (r < 0 || g < 0 || b < 0)
                 {
@@ -224,7 +231,7 @@ int main()
     cout << dz_dx << " " << dz_dy << endl;
     compute_derivatives(0,1,1,1,0,-1,0,0,0, dz_dx, dz_dy);
     cout << dz_dx << " " << dz_dy << endl;
-    cout << shadowing(0,0,0,0,1,1,1,0,-1, 315, 20) << endl << endl;
+    cout << hill_shading(0,0,0,0,1,1,1,0,-1, 315, 20) << endl << endl;
     // Initialisation des référentiels de coordonnées :
     PJ *P = proj_create_crs_to_crs(
         PJ_DEFAULT_CTX,
