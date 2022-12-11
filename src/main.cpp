@@ -218,9 +218,13 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
 int main()
 {
     double dz_dx, dz_dy;
-    compute_derivatives(150997.000024, 6826137.999733, 21.544000, 150898.000000, 6826146.000102, 17.769000, 150998.000363, 6826138.000415, 21.536000, dz_dx, dz_dy);
+    compute_derivatives(0,0,0,0,1,1,1,0,-1, dz_dx, dz_dy);
     cout << dz_dx << " " << dz_dy << endl;
-    cout << shadowing(150997.000024, 6826137.999733, 21.544000, 150898.000000, 6826146.000102, 17.769000, 150998.000363, 6826138.000415, 21.536000, 315, 20) << endl << endl;
+    compute_derivatives(1,0,-1,0,0,0,0,1,1, dz_dx, dz_dy);
+    cout << dz_dx << " " << dz_dy << endl;
+    compute_derivatives(0,1,1,1,0,-1,0,0,0, dz_dx, dz_dy);
+    cout << dz_dx << " " << dz_dy << endl;
+    cout << shadowing(0,0,0,0,1,1,1,0,-1, 315, 20) << endl << endl;
     // Initialisation des référentiels de coordonnées :
     PJ *P = proj_create_crs_to_crs(
         PJ_DEFAULT_CTX,
