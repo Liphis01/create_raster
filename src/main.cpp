@@ -109,7 +109,7 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
     else
     {
         // File characteristics
-        f << "P3" << endl
+        f << "P6" << endl
           << w << " " << h << endl
           << 255 << endl;
 
@@ -135,9 +135,9 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int idx_triangle = find_triangle(x, y, d);
                 if (idx_triangle == -1)
                 {
-                    f << backgroundColor << " "
-                      << backgroundColor << " "
-                      << backgroundColor << " ";
+                    f << (char)backgroundColor
+                      << (char)backgroundColor
+                      << (char)backgroundColor;
                     x += x_step;
                     continue;
                 }
@@ -159,13 +159,12 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
 
                 int r, g, b;
                 HSLToRGB(hueValue, .5f, .5f, r, g, b);
-                f << r << " "
-                  << g << " "
-                  << b << " ";
+                f << (char)r
+                  << (char)g
+                  << (char)b;
 
                 x += x_step;
             }
-            f << endl;
             y -= y_step;
         }
     }
