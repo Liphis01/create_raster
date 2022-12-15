@@ -2,7 +2,7 @@
 #include <fstream>
 #include <math.h>
 #include <proj.h>
-#include <delaunator.hpp>
+#include "delaunator.hpp"
 #include <map>
 #include "HSL.cpp"
 
