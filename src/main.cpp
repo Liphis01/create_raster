@@ -1,9 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include <math.h>
 #include <proj.h>
-#include <delaunator.hpp>
+#include "delaunator.hpp"
 #include <map>
 #include "HSL.cpp"
+
+#define M_PI 3.14159265358979323846 /* pi */
 
 using namespace std;
 
@@ -73,9 +76,21 @@ double compute_alti(double px, double py, double tx0, double ty0, double tz0, do
     return tz0 + ((tx0 - px) * cx + (ty0 - py) * cy) / cz;
 }
 
+void compute_derivatives(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double &dz_dx, double &dz_dy)
+{
+    double cx = (y1 - y0) * (z2 - z1) - (z1 - z0) * (y2 - y1);
+    double cy = (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1);
+    double cz = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+    dz_dx = - cx / cz;
+    dz_dy = - cy / cz;
+    // double denom =   (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
+    // dz_dx =   (z1 - z0) * (y2 - y1) - (y1 - y0) * (z2 - z1) / denom; 
+    // dz_dy = - (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1) / denom;
+}
+
 void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_y, double &max_x, double &max_y)
 {
-    min_x = 1e+300, min_y = 1e+300, max_x = 0, max_y = 0;
+    min_x = INFINITY, min_y = INFINITY, max_x = 0, max_y = 0;
     for (int i = 0; i < coords.size(); i += 2)
     {
         if (coords[i] <= min_x)
@@ -93,6 +108,56 @@ void get_xy_boundaries(const vector<double> &coords, double &min_x, double &min_
         if (coords[i] >= max_y)
             max_y = coords[i];
     }
+}
+
+double hill_shading(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double azimut_deg = 315., double altitude_deg = 45.)
+{
+    double zenith_deg = 90 - altitude_deg;
+    double zenith_rad = zenith_deg * M_PI / 180;
+
+    double azimuth_math = fmod(360 - azimut_deg + 90, 360);
+    double azimuth_rad = azimuth_math * M_PI / 180;
+
+    double dz_dx, dz_dy;
+    double neighs[9]; // 9 neighbor cells starting with vertex (x0, y0, z0)
+    for (int i = 0; i < 9; i++)
+    {
+        neighs[i] = compute_alti(x0 + i%3, y0 + i/3, x0, y0, z0, x1, y1, z1, x2, y2, z2);
+    }
+    // compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
+    dz_dx = ((neighs[2] + 2*neighs[5] + neighs[8]) - (neighs[0] + 2*neighs[3] + neighs[6])) / 8;
+    dz_dx = ((neighs[6] + 2*neighs[7] + neighs[8]) - (neighs[0] + 2*neighs[1] + neighs[2])) / 8;
+
+    double slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
+    double aspect_rad = fmod(atan2(dz_dy, -dz_dx) + 2 * M_PI, 2 * M_PI);
+
+    // printf("%f, %f, %f, %f, %f\n", cos(zenith_rad), cos(slope_rad), sin(zenith_rad), sin(slope_rad), cos(azimuth_rad - aspect_rad));
+    return cos(zenith_rad) * cos(slope_rad) + sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad);
+}
+
+double hill_shading(double x0, double y0, double z0, double x1, double y1, double z1, double x2, double y2, double z2, double azimut_deg = 315., double altitude_deg = 45.)
+{
+    double zenith_deg = 90 - altitude_deg;
+    double zenith_rad = zenith_deg * M_PI / 180;
+
+    double azimuth_math = fmod(360 - azimut_deg + 90, 360);
+    double azimuth_rad = azimuth_math * M_PI / 180;
+
+    double dz_dx, dz_dy;
+    double neighs[9]; // 9 neighbor cells starting with vertex (x0, y0, z0)
+    for (int i = 0; i < 9; i++)
+    {
+        neighs[i] = compute_alti(x0 + i%3, y0 + i/3, x0, y0, z0, x1, y1, z1, x2, y2, z2);
+    }
+    // compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
+    dz_dx = ((neighs[2] + 2*neighs[5] + neighs[8]) - (neighs[0] + 2*neighs[3] + neighs[6])) / 8;
+    dz_dx = ((neighs[6] + 2*neighs[7] + neighs[8]) - (neighs[0] + 2*neighs[1] + neighs[2])) / 8;
+
+    double slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
+    double aspect_rad = fmod(atan2(dz_dy, -dz_dx) + 2 * M_PI, 2 * M_PI);
+
+    // printf("%f, %f, %f, %f, %f\n", cos(zenith_rad), cos(slope_rad), sin(zenith_rad), sin(slope_rad), cos(azimuth_rad - aspect_rad));
+    return cos(zenith_rad) * cos(slope_rad) + sin(zenith_rad) * sin(slope_rad) * cos(azimuth_rad - aspect_rad);
 }
 
 void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &altitudes, int w, int h, string filename)
@@ -158,10 +223,16 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                HSLToRGB(hueValue, .5f, .5f, r, g, b);
-                f << (char)r
-                  << (char)g
-                  << (char)b;
+                double lum = hill_shading(tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2, 315, 20);
+                HSLToRGB(hueValue, .5f, lum, r, g, b);
+                if (r < 0 || g < 0 || b < 0)
+                {
+                    printf("rgb : %d, %d, %d\nhue, lum : %d, %f\n", r, g, b, hueValue, lum);
+                    printf("compute_derivatives(%f, %f, %f, %f, %f, %f, %f, %f, %f, dz_dx, dz_dy);\n\n", tx0, ty0, tz0, tx1, ty1, tz1, tx2, ty2, tz2);
+                }
+                f << (char)max(r, 0)
+                  << (char)max(g, 0)
+                  << (char)max(b, 0);
 
                 x += x_step;
             }
@@ -174,6 +245,14 @@ void draw_raster(delaunator::Delaunator &d, map<pair<double, double>, double> &a
 
 int main(int argc, char const *argv[])
 {
+    double dz_dx, dz_dy;
+    compute_derivatives(0,0,0,0,1,1,1,0,-1, dz_dx, dz_dy);
+    cout << dz_dx << " " << dz_dy << endl;
+    compute_derivatives(1,0,-1,0,0,0,0,1,1, dz_dx, dz_dy);
+    cout << dz_dx << " " << dz_dy << endl;
+    compute_derivatives(0,1,1,1,0,-1,0,0,0, dz_dx, dz_dy);
+    cout << dz_dx << " " << dz_dy << endl;
+    cout << hill_shading(0,0,0,0,1,1,1,0,-1, 315, 20) << endl << endl;
     // Initialisation des référentiels de coordonnées :
     PJ *P = proj_create_crs_to_crs(
         PJ_DEFAULT_CTX,
