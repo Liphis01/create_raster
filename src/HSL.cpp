@@ -1,24 +1,24 @@
-#include <iostream>
+#include "HSL.h"
 
-static float Min(float a, float b)
+static double Min(double a, double b)
 {
 	return a <= b ? a : b;
 }
 
-static float Max(float a, float b)
+static double Max(double a, double b)
 {
 	return a >= b ? a : b;
 }
 
-static void RGBToHSL(int R, int G, int B, int &H, int &S, float &L)
+void RGBToHSL(int R, int G, int B, int &H, int &S, double &L)
 {
-	float r = (R / 255.0f);
-	float g = (G / 255.0f);
-	float b = (B / 255.0f);
+	double r = (R / 255.0f);
+	double g = (G / 255.0f);
+	double b = (B / 255.0f);
 
-	float min = Min(Min(r, g), b);
-	float max = Max(Max(r, g), b);
-	float delta = max - min;
+	double min = Min(Min(r, g), b);
+	double max = Max(Max(r, g), b);
+	double delta = max - min;
 
 	L = (max + min) / 2;
 
@@ -31,7 +31,7 @@ static void RGBToHSL(int R, int G, int B, int &H, int &S, float &L)
 	{
 		S = (L <= 0.5) ? (delta / (max + min)) : (delta / (2 - max - min));
 
-		float hue;
+		double hue;
 
 		if (r == max)
 		{
@@ -57,7 +57,7 @@ static void RGBToHSL(int R, int G, int B, int &H, int &S, float &L)
 	return;
 }
 
-static float HueToRGB(float v1, float v2, float vH)
+double HueToRGB(double v1, double v2, double vH)
 {
 	if (vH < 0)
 		vH += 1;
@@ -77,7 +77,7 @@ static float HueToRGB(float v1, float v2, float vH)
 	return v1;
 }
 
-static void HSLToRGB(int H, float S, float L, int &r, int &g, int &b)
+void HSLToRGB(int H, double S, double L, int &r, int &g, int &b)
 {
 	if (S == 0)
 	{
@@ -85,8 +85,8 @@ static void HSLToRGB(int H, float S, float L, int &r, int &g, int &b)
 	}
 	else
 	{
-		float v1, v2;
-		float hue = (float)H / 360;
+		double v1, v2;
+		double hue = (double)H / 360;
 
 		v2 = (L < 0.5) ? (L * (1 + S)) : ((L + S) - (L * S));
 		v1 = 2 * L - v2;
