@@ -34,7 +34,7 @@ ostream &operator<<(ostream &os, const BR &b);
 struct RTreeNode
 {
     NodeType nodeType;            // Whether this node is a leaf or an internal node
-    const Triangle dataObject;          // Stores the triangle after leaf nodese
+    const Triangle dataObject;          // Stores the triangle after leaf nodes
     BR bounds;                    // Bounding box for this node, covering all its children
     vector<RTreeNode *> children; // List of children for this node
 

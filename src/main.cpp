@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
     delaunator::Delaunator d(coords);
     
     // Insertion of the triangles in a R-Tree
-    RTree tree(8, 17);
+    RTree tree(2, 5);
     InsertTriangles(d, tree);
 
     // Draw raster
