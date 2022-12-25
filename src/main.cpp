@@ -195,7 +195,7 @@ double hill_shading(Triangle triangle, double z0, double z1, double z2, double a
     }
     // compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
     dz_dx = ((neighs[2] + 2*neighs[5] + neighs[8]) - (neighs[0] + 2*neighs[3] + neighs[6])) / 8;
-    dz_dx = ((neighs[6] + 2*neighs[7] + neighs[8]) - (neighs[0] + 2*neighs[1] + neighs[2])) / 8;
+    dz_dy = ((neighs[6] + 2*neighs[7] + neighs[8]) - (neighs[0] + 2*neighs[1] + neighs[2])) / 8;
 
     double slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
     double aspect_rad = fmod(atan2(dz_dy, -dz_dx) + 2 * M_PI, 2 * M_PI);
@@ -260,7 +260,7 @@ void draw_raster(RTree &tree, map<pair<double, double>, double> &altitudes, BR r
                 int hueValue = (z - min_z) * 360 / (max_z - min_z);
 
                 int r, g, b;
-                double lum = hill_shading(triangle, z0, z1, z2, 315, 20);
+                double lum = hill_shading(triangle, z0, z1, z2, 315, 25);
                 HSLToRGB(hueValue, .5f, lum, r, g, b);
                 if (r < 0 || g < 0 || b < 0)
                 {
