@@ -56,16 +56,20 @@ public:
     // m is the minimum number of children allowed for each node
     // M is the maximum number of children allowed for each node.
     // Value of m is usually 40% of M and at most 50%.
-    int m_m, m_M;
+    const int m_m = 2, m_M = 5;
+    int m_depth = 1, m_dataNumber = 0;
+    RTreeNode *root_;
 
 private:
     vector<Triangle> Search(pair<double, double> point, const RTreeNode &node) const;
 
-    RTreeNode *FindLeaf(BR triangleBounds, vector<RTreeNode *> &path) const;
+    RTreeNode *ChooseLeaf(BR triangleBounds, vector<RTreeNode *> &path) const;
 
-    void SplitNode(RTreeNode *node);
+    void SplitNode(RTreeNode *parentNode, RTreeNode *node);
 
-    void ChooseSplitEntries(const RTreeNode *node, RTreeNode *&entry1, RTreeNode *&entry2) const;
+    void PickSeeds(const RTreeNode *node, RTreeNode *&entry1, RTreeNode *&entry2) const;
+
+    RTreeNode *PickNext(const vector<RTreeNode *> &entries, BR bounds1, BR bounds2, double &areaDiff) const;
 
     void AdjustTree(vector<RTreeNode *> &path);
 
@@ -73,9 +77,9 @@ private:
 
     double CalculateBoundsArea(const BR &bounds) const;
 
-    double AreaCost(const BR &bounds1, const BR &bounds2) const;
+    double AreaCost(const BR &bounds1, const BR &boundsOfInsertedNode) const;
 
-    RTreeNode *root_; // Root node of the tree
+    // RTreeNode *root_; // Root node of the tree
 };
 
 #endif

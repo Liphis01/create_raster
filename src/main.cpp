@@ -116,10 +116,10 @@ void compute_derivatives(double x0, double y0, double z0, double x1, double y1, 
     double cx = (y1 - y0) * (z2 - z1) - (z1 - z0) * (y2 - y1);
     double cy = (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1);
     double cz = (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
-    dz_dx = - cx / cz;
-    dz_dy = - cy / cz;
+    dz_dx = -cx / cz;
+    dz_dy = -cy / cz;
     // double denom =   (x1 - x0) * (y2 - y1) - (y1 - y0) * (x2 - x1);
-    // dz_dx =   (z1 - z0) * (y2 - y1) - (y1 - y0) * (z2 - z1) / denom; 
+    // dz_dx =   (z1 - z0) * (y2 - y1) - (y1 - y0) * (z2 - z1) / denom;
     // dz_dy = - (z1 - z0) * (x2 - x1) - (x1 - x0) * (z2 - z1) / denom;
 }
 
@@ -145,38 +145,43 @@ BR get_xyz_boundaries(const vector<double> &coords, std::map<std::pair<double, d
     }
 
     double min_z = min_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y)
-                        { return x.second < y.second; })
-                ->second;
+                               { return x.second < y.second; })
+                       ->second;
     double max_z = max_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y)
-                        { return x.second < y.second; })
-                ->second;
-    
+                               { return x.second < y.second; })
+                       ->second;
+
     return {make_pair(min_x, max_x), make_pair(min_y, max_y), make_pair(min_z, max_z)};
 }
 
 void InsertTriangles(delaunator::Delaunator &d, RTree &tree)
 {
-    double area_filter = INFINITY;
+    double area_filter = .6; // rade
+    int nbSkipped = 0;
 
-    cout << "Taux de triangles insérés dans l'arbre :" << endl;
+    cout << "Taux de triangles insérés dans l'arbre" << endl;
     for (int i = 0; i < d.triangles.size(); i += 3)
     // for (int i = 0; i < 102; i += 3)
     {
-        double x0 = d.coords[2 * d.triangles[i]],      // x0
-            y0 = d.coords[2 * d.triangles[i] + 1],     // y0
-            x1 = d.coords[2 * d.triangles[i + 1]],     // x1
-            y1 = d.coords[2 * d.triangles[i + 1] + 1], // y1
-            x2 = d.coords[2 * d.triangles[i + 2]],     // x2
-            y2 = d.coords[2 * d.triangles[i + 2] + 1]; // y2
+        double x0 = d.coords[2 * d.triangles[i]],
+               y0 = d.coords[2 * d.triangles[i] + 1],
+               x1 = d.coords[2 * d.triangles[i + 1]],
+               y1 = d.coords[2 * d.triangles[i + 1] + 1],
+               x2 = d.coords[2 * d.triangles[i + 2]],
+               y2 = d.coords[2 * d.triangles[i + 2] + 1];
 
         Triangle triangle(x0, y0, x1, y1, x2, y2);
         double area = triangle.Area();
-        if (triangle.Area() <= area_filter)
+        if (0 < area && area <= area_filter)
             tree.Insert(triangle);
+            
+        else
+            nbSkipped++;
 
         ProgressBar((double)(i + 3) / d.triangles.size());
         // ProgressBar((double)(i + 3) / 102);
     }
+    cout << "Nombre de triangles supprimés car trop larges : " << nbSkipped << "/" << d.triangles.size()/3 << endl;
 }
 
 double hill_shading(Triangle triangle, double z0, double z1, double z2, double azimut_deg = 315., double altitude_deg = 45.)
@@ -191,11 +196,11 @@ double hill_shading(Triangle triangle, double z0, double z1, double z2, double a
     double neighs[9]; // 9 neighbor cells starting with vertex (x0, y0, z0)
     for (int i = 0; i < 9; i++)
     {
-        neighs[i] = compute_alti(make_pair(triangle.vertex0.first + i%3, triangle.vertex0.second + i/3), triangle, z0, z1, z2);
+        neighs[i] = compute_alti(make_pair(triangle.vertex0.first + i % 3, triangle.vertex0.second + i / 3), triangle, z0, z1, z2);
     }
     // compute_derivatives(x0, y0, z0, x1, y1, z1, x2, y2, z2, dz_dx, dz_dy);
-    dz_dx = ((neighs[2] + 2*neighs[5] + neighs[8]) - (neighs[0] + 2*neighs[3] + neighs[6])) / 8;
-    dz_dy = ((neighs[6] + 2*neighs[7] + neighs[8]) - (neighs[0] + 2*neighs[1] + neighs[2])) / 8;
+    dz_dx = ((neighs[2] + 2 * neighs[5] + neighs[8]) - (neighs[0] + 2 * neighs[3] + neighs[6])) / 8;
+    dz_dy = ((neighs[6] + 2 * neighs[7] + neighs[8]) - (neighs[0] + 2 * neighs[1] + neighs[2])) / 8;
 
     double slope_rad = atan(1 * sqrt(dz_dx * dz_dx + dz_dy * dz_dy));
     double aspect_rad = fmod(atan2(dz_dy, -dz_dx) + 2 * M_PI, 2 * M_PI);
@@ -257,7 +262,7 @@ void draw_raster(RTree &tree, map<pair<double, double>, double> &altitudes, BR r
                 double z2 = altitudes.find(triangle.vertex2)->second;
 
                 double z = compute_alti(make_pair(x, y), triangle, z0, z1, z2);
-                int hueValue = (z - min_z) * 360 / (max_z - min_z);
+                int hueValue = (max_z - z) * 360 / (max_z - min_z);
 
                 int r, g, b;
                 double lum = hill_shading(triangle, z0, z1, z2, 315, 25);
@@ -274,7 +279,7 @@ void draw_raster(RTree &tree, map<pair<double, double>, double> &altitudes, BR r
                 x += x_step;
             }
             y -= y_step;
-            ProgressBar(double(i+1)/w);
+            ProgressBar(double(i + 1) / w);
         }
     }
 
@@ -291,7 +296,8 @@ int main(int argc, char *argv[])
         NULL);
     // ^ peut prendre du temps, à ne faire qu'une seule fois
 
-    if (0 == P) {
+    if (0 == P)
+    {
         fprintf(stderr, "Failed to create transformation object.\n");
 
         return 1;
@@ -320,16 +326,16 @@ int main(int argc, char *argv[])
         // Storing file's data in a vector and a map
         while (!f_data.eof())
             add_coords(f_data, P, coords, altitudes);
-        
+
         proj_destroy(P);
         f_data.close();
     }
 
     // Triangulation
     delaunator::Delaunator d(coords);
-    
+
     // Insertion of the triangles in a R-Tree
-    RTree tree(2, 5);
+    RTree tree(6, 15);
     InsertTriangles(d, tree);
 
     // Draw raster
@@ -347,5 +353,3 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
-
-
