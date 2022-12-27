@@ -57,7 +57,7 @@ void RGBToHSL(int R, int G, int B, int &H, int &S, double &L)
 	return;
 }
 
-double HueToRGB(double v1, double v2, double vH)
+double hueToRGB(double v1, double v2, double vH)
 {
 	if (vH < 0)
 		vH += 1;
@@ -91,9 +91,9 @@ void HSLToRGB(int H, double S, double L, int &r, int &g, int &b)
 		v2 = (L < 0.5) ? (L * (1 + S)) : ((L + S) - (L * S));
 		v1 = 2 * L - v2;
 
-		r = (int)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
-		g = (int)(255 * HueToRGB(v1, v2, hue));
-		b = (int)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
+		r = (int)(255 * hueToRGB(v1, v2, hue + (1.0f / 3)));
+		g = (int)(255 * hueToRGB(v1, v2, hue));
+		b = (int)(255 * hueToRGB(v1, v2, hue - (1.0f / 3)));
 	}
 
 	return;

@@ -5,7 +5,7 @@
 TEST(Shadows, triangle1)
 {
     EXPECT_EQ(2, 1);
-    // EXPECT_EQ(HillShading(1,0,0,0,1,0,0,0,1,45,45), .5);
+    // EXPECT_EQ(hillShading(1,0,0,0,1,0,0,0,1,45,45), .5);
 }
 
 int sideEffect = 42;

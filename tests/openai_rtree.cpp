@@ -3,7 +3,7 @@ class RTree
 public:
     RTree() : root_(nullptr) {}
 
-    // Insert a new data point into the R-tree
+    // insert a new data point into the R-tree
     void insert(const Point &p, int id)
     {
         if (!root_)
@@ -17,7 +17,7 @@ public:
         insert(p, id, n, 1);
     }
 
-    // Search for data points within a given rectangle
+    // search for data points within a given rectangle
     std::vector<int> search(const Rect &r) const
     {
         std::vector<int> results;
