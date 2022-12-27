@@ -1,0 +1,118 @@
+\hypertarget{structTriangle}{}\doxysection{Triangle Struct Reference}
+\label{structTriangle}\index{Triangle@{Triangle}}
+
+
+Struct representing a triangle in 2D space.  
+
+
+
+
+{\ttfamily \#include $<$R\+Tree.\+h$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structTriangle_aaefe4ed500c07918d30c6f0e286332c5}{Triangle}} ()
+\begin{DoxyCompactList}\small\item\em Constructor for a triangle. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structTriangle_a666b4ca158f72744dc082efeeb603375}{Triangle}} (double x0, double y0, double x1, double y1, double x2, double y2)
+\begin{DoxyCompactList}\small\item\em Constructor for a triangle. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{structTriangle_a0d301955b4b0d752cffe7fc3d3574156}{point\+In\+Triangle}} (const pair$<$ double, double $>$ \&point) const
+\begin{DoxyCompactList}\small\item\em Check whether a point is inside the triangle. \end{DoxyCompactList}\item 
+double \mbox{\hyperlink{structTriangle_a4dcaa40edddf0190ce3e5f235c402b3f}{Area}} () const
+\begin{DoxyCompactList}\small\item\em Calculates the area of the triangle. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structTriangle_ada873dee0eb6211d4b51faf3baa54f65}\label{structTriangle_ada873dee0eb6211d4b51faf3baa54f65}} 
+pair$<$ double, double $>$ \mbox{\hyperlink{structTriangle_ada873dee0eb6211d4b51faf3baa54f65}{vertex0}}
+\begin{DoxyCompactList}\small\item\em (x0, y0) \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structTriangle_af701b2fe34be5917563a984a0c70220e}\label{structTriangle_af701b2fe34be5917563a984a0c70220e}} 
+pair$<$ double, double $>$ \mbox{\hyperlink{structTriangle_af701b2fe34be5917563a984a0c70220e}{vertex1}}
+\begin{DoxyCompactList}\small\item\em (x1, y1) \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structTriangle_a384415d8708671b071051a2f02a5e550}\label{structTriangle_a384415d8708671b071051a2f02a5e550}} 
+pair$<$ double, double $>$ \mbox{\hyperlink{structTriangle_a384415d8708671b071051a2f02a5e550}{vertex2}}
+\begin{DoxyCompactList}\small\item\em (x2, y2) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Struct representing a triangle in 2D space. 
+
+A triangle is defined by three vertices, each represented as a pair of x and y coordinates. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{structTriangle_aaefe4ed500c07918d30c6f0e286332c5}\label{structTriangle_aaefe4ed500c07918d30c6f0e286332c5}} 
+\index{Triangle@{Triangle}!Triangle@{Triangle}}
+\index{Triangle@{Triangle}!Triangle@{Triangle}}
+\doxysubsubsection{\texorpdfstring{Triangle()}{Triangle()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Triangle\+::\+Triangle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Constructor for a triangle. 
+
+Creates a triangle with default values for its vertices. \mbox{\Hypertarget{structTriangle_a666b4ca158f72744dc082efeeb603375}\label{structTriangle_a666b4ca158f72744dc082efeeb603375}} 
+\index{Triangle@{Triangle}!Triangle@{Triangle}}
+\index{Triangle@{Triangle}!Triangle@{Triangle}}
+\doxysubsubsection{\texorpdfstring{Triangle()}{Triangle()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Triangle\+::\+Triangle (\begin{DoxyParamCaption}\item[{double}]{x0,  }\item[{double}]{y0,  }\item[{double}]{x1,  }\item[{double}]{y1,  }\item[{double}]{x2,  }\item[{double}]{y2 }\end{DoxyParamCaption})}
+
+
+
+Constructor for a triangle. 
+
+Creates a triangle with the given values for its vertices.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x0} & x coordinate of the first vertex. \\
+\hline
+{\em y0} & y coordinate of the first vertex. \\
+\hline
+{\em x1} & x coordinate of the second vertex. \\
+\hline
+{\em y1} & y coordinate of the second vertex. \\
+\hline
+{\em x2} & x coordinate of the third vertex. \\
+\hline
+{\em y2} & y coordinate of the third vertex. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{structTriangle_a4dcaa40edddf0190ce3e5f235c402b3f}\label{structTriangle_a4dcaa40edddf0190ce3e5f235c402b3f}} 
+\index{Triangle@{Triangle}!Area@{Area}}
+\index{Area@{Area}!Triangle@{Triangle}}
+\doxysubsubsection{\texorpdfstring{Area()}{Area()}}
+{\footnotesize\ttfamily double Triangle\+::\+Area (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Calculates the area of the triangle. 
+
+\begin{DoxyReturn}{Returns}
+Area of the triangle. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{structTriangle_a0d301955b4b0d752cffe7fc3d3574156}\label{structTriangle_a0d301955b4b0d752cffe7fc3d3574156}} 
+\index{Triangle@{Triangle}!pointInTriangle@{pointInTriangle}}
+\index{pointInTriangle@{pointInTriangle}!Triangle@{Triangle}}
+\doxysubsubsection{\texorpdfstring{pointInTriangle()}{pointInTriangle()}}
+{\footnotesize\ttfamily bool Triangle\+::point\+In\+Triangle (\begin{DoxyParamCaption}\item[{const pair$<$ double, double $>$ \&}]{point }\end{DoxyParamCaption}) const}
+
+
+
+Check whether a point is inside the triangle. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em point} & Point to check. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the point is inside the triangle, false otherwise. 
+\end{DoxyReturn}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/R\+Tree.\+h\end{DoxyCompactItemize}

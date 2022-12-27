@@ -281,7 +281,6 @@ void createRaster(ofstream &f, const RTree &tree, const map<pair<double, double>
         if (h / 100 == 0 || i % (h / 100) == (h - 1) % (h / 100))
             progressBar(double(i + 1) / h);
     }
-    cout << endl;
 }
 
 int main(int argc, char const *argv[])
@@ -335,5 +334,6 @@ int main(int argc, char const *argv[])
     }
     f.close();
 
+    cout << "finished..." << endl;
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,90 @@
+\hypertarget{structRTreeNode}{}\doxysection{R\+Tree\+Node Struct Reference}
+\label{structRTreeNode}\index{RTreeNode@{RTreeNode}}
+
+
+Struct representing a node in an R-\/tree.  
+
+
+
+
+{\ttfamily \#include $<$R\+Tree.\+h$>$}
+
+
+
+Collaboration diagram for R\+Tree\+Node\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=171pt]{structRTreeNode__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structRTreeNode_a96a67c07164e6cb9b2e276c641976106}{R\+Tree\+Node}} (Node\+Type \mbox{\hyperlink{structRTreeNode_affaa9037309adeeb70fcfec6b68cd74a}{node\+Type}})
+\begin{DoxyCompactList}\small\item\em Constructor for an R-\/tree node. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structRTreeNode_a1a8b51a6fb6e331eb2a4793826a5ab5f}{R\+Tree\+Node}} (const \mbox{\hyperlink{structTriangle}{Triangle}} \&\mbox{\hyperlink{structRTreeNode_a259014056296ed96d6013c1fac412fce}{data\+Object}}, const BR \&data\+Bounds)
+\begin{DoxyCompactList}\small\item\em Constructor for a leaf R-\/tree node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structRTreeNode_a9d4bfb8959cf1c48a3d779d974244bc2}\label{structRTreeNode_a9d4bfb8959cf1c48a3d779d974244bc2}} 
+\mbox{\hyperlink{structRTreeNode_a9d4bfb8959cf1c48a3d779d974244bc2}{$\sim$\+R\+Tree\+Node}} ()
+\begin{DoxyCompactList}\small\item\em Destructor for an R-\/tree node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structRTreeNode_affaa9037309adeeb70fcfec6b68cd74a}\label{structRTreeNode_affaa9037309adeeb70fcfec6b68cd74a}} 
+Node\+Type \mbox{\hyperlink{structRTreeNode_affaa9037309adeeb70fcfec6b68cd74a}{node\+Type}}
+\begin{DoxyCompactList}\small\item\em Whether this node is a leaf or an internal node. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structRTreeNode_a259014056296ed96d6013c1fac412fce}\label{structRTreeNode_a259014056296ed96d6013c1fac412fce}} 
+const \mbox{\hyperlink{structTriangle}{Triangle}} \mbox{\hyperlink{structRTreeNode_a259014056296ed96d6013c1fac412fce}{data\+Object}}
+\begin{DoxyCompactList}\small\item\em Stores the triangle after leaf nodes. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structRTreeNode_a32a90cdb8c28267da13728a0364bf09c}\label{structRTreeNode_a32a90cdb8c28267da13728a0364bf09c}} 
+BR \mbox{\hyperlink{structRTreeNode_a32a90cdb8c28267da13728a0364bf09c}{bounds}}
+\begin{DoxyCompactList}\small\item\em Bounding box for this node, covering all its children. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structRTreeNode_afe682c2429a1c992da0dd14be53094fd}\label{structRTreeNode_afe682c2429a1c992da0dd14be53094fd}} 
+vector$<$ \mbox{\hyperlink{structRTreeNode}{R\+Tree\+Node}} $\ast$ $>$ \mbox{\hyperlink{structRTreeNode_afe682c2429a1c992da0dd14be53094fd}{children}}
+\begin{DoxyCompactList}\small\item\em List of children for this node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Struct representing a node in an R-\/tree. 
+
+A node in an R-\/tree can be either a leaf or an internal node. If it is a leaf, it stores a triangle, otherwise it stores a list of children. Each node also has a bounding box that covers all of its children. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{structRTreeNode_a96a67c07164e6cb9b2e276c641976106}\label{structRTreeNode_a96a67c07164e6cb9b2e276c641976106}} 
+\index{RTreeNode@{RTreeNode}!RTreeNode@{RTreeNode}}
+\index{RTreeNode@{RTreeNode}!RTreeNode@{RTreeNode}}
+\doxysubsubsection{\texorpdfstring{RTreeNode()}{RTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily R\+Tree\+Node\+::\+R\+Tree\+Node (\begin{DoxyParamCaption}\item[{Node\+Type}]{node\+Type }\end{DoxyParamCaption})}
+
+
+
+Constructor for an R-\/tree node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em node\+Type} & Type of the node (leaf or internal). \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{structRTreeNode_a1a8b51a6fb6e331eb2a4793826a5ab5f}\label{structRTreeNode_a1a8b51a6fb6e331eb2a4793826a5ab5f}} 
+\index{RTreeNode@{RTreeNode}!RTreeNode@{RTreeNode}}
+\index{RTreeNode@{RTreeNode}!RTreeNode@{RTreeNode}}
+\doxysubsubsection{\texorpdfstring{RTreeNode()}{RTreeNode()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily R\+Tree\+Node\+::\+R\+Tree\+Node (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structTriangle}{Triangle}} \&}]{data\+Object,  }\item[{const BR \&}]{data\+Bounds }\end{DoxyParamCaption})}
+
+
+
+Constructor for a leaf R-\/tree node. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em data\+Object} & \mbox{\hyperlink{structTriangle}{Triangle}} to be stored in the leaf node. \\
+\hline
+{\em data\+Bounds} & Bounding box for the triangle. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/R\+Tree.\+h\end{DoxyCompactItemize}
