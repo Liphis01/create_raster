@@ -24,12 +24,9 @@ struct Triangle
     // Constructor for a triangle
     Triangle();
     Triangle(double, double, double, double, double, double);
-    bool PointInTriangle(pair<double, double> point) const;
+    bool PointInTriangle(pair<double, double> &point) const;
     double Area() const;
 };
-
-ostream &operator<<(ostream &os, const Triangle &triangle);
-ostream &operator<<(ostream &os, const BR &b);
 
 struct RTreeNode
 {
@@ -50,7 +47,7 @@ public:
     RTree();
     RTree(int MIN_CHILDREN, int MAX_CHILDREN);
     ~RTree();
-    void Insert(Triangle triangle);
+    void Insert(Triangle &triangle);
     vector<Triangle> Search(pair<double, double> point) const; // Candidates for specific point
 
     // m is the minimum number of children allowed for each node
@@ -58,20 +55,19 @@ public:
     // Value of m is usually 40% of M and at most 50%.
     const int m_m = 2, m_M = 5;
     int m_depth = 1, m_dataNumber = 0;
-    RTreeNode *root_;
 
 private:
-    vector<Triangle> Search(pair<double, double> point, const RTreeNode &node) const;
+    vector<Triangle> Search(pair<double, double> &point, const RTreeNode &node) const;
 
-    RTreeNode *ChooseLeaf(BR triangleBounds, vector<RTreeNode *> &path) const;
+    RTreeNode *ChooseLeaf(BR &triangleBounds, vector<RTreeNode *> &path) const;
 
     void SplitNode(RTreeNode *parentNode, RTreeNode *node);
 
     void PickSeeds(const RTreeNode *node, RTreeNode *&entry1, RTreeNode *&entry2) const;
 
-    RTreeNode *PickNext(const vector<RTreeNode *> &entries, BR bounds1, BR bounds2, double &areaDiff) const;
+    RTreeNode *PickNext(const vector<RTreeNode *> &entries, BR &bounds1, BR &bounds2, double &areaDiff) const;
 
-    void AdjustTree(vector<RTreeNode *> &path);
+    void AdjustTree(vector<RTreeNode *> &path, const BR &newBR);
 
     BR CalculateBounds(const BR &bounds1, const BR &bounds2) const;
 
@@ -79,7 +75,11 @@ private:
 
     double AreaCost(const BR &bounds1, const BR &boundsOfInsertedNode) const;
 
-    // RTreeNode *root_; // Root node of the tree
+    RTreeNode *root_; // Root node of the tree
 };
+
+ostream &operator<<(ostream &os, const Triangle &triangle);
+ostream &operator<<(ostream &os, const BR &b);
+ostream &operator<<(ostream &os, const RTree &tree);
 
 #endif

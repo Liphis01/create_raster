@@ -7,7 +7,7 @@ Triangle::Triangle() {}
 
 Triangle::Triangle(const double x0, const double y0, double x1, double y1, double x2, double y2) : vertex0(make_pair(x0, y0)), vertex1(make_pair(x1, y1)), vertex2(make_pair(x2, y2)) {}
 
-bool Triangle::PointInTriangle(pair<double, double> point) const
+bool Triangle::PointInTriangle(pair<double, double> &point) const
 {
     // Checks if a point is within a triangle's bounds
     double tx0 = this->vertex0.first, ty0 = this->vertex0.second;
@@ -46,6 +46,11 @@ ostream &operator<<(ostream &os, const BR &b)
     return os;
 }
 
+ostream &operator<<(ostream &os, const RTree &tree)
+{
+    return os << "L'arbre de paramètres (m, M) = (" << tree.m_m << ", " << tree.m_M << ") contient " << tree.m_dataNumber << " objets et a une hauteur de " << tree.m_depth << endl;
+}
+
 RTreeNode::RTreeNode(NodeType nodeType) : nodeType(nodeType) {}
 
 RTreeNode::RTreeNode(Triangle dataObject, BR dataBounds) : nodeType(DATA), dataObject(dataObject), bounds(dataBounds) {}
@@ -62,7 +67,7 @@ RTreeNode::~RTreeNode()
         delete child;
 }
 
-BR MBR_of_triangle(Triangle triangle) // Minimum Bounding Rectangle
+BR MBR_of_triangle(Triangle &triangle) // Minimum Bounding Rectangle
 {
     BR result;
 
@@ -101,7 +106,7 @@ vector<Triangle> RTree::Search(pair<double, double> point) const
     return this->Search(point, *root_);
 }
 
-vector<Triangle> RTree::Search(pair<double, double> point, const RTreeNode &node) const
+vector<Triangle> RTree::Search(pair<double, double> &point, const RTreeNode &node) const
 {
     if (node.nodeType == DATA && node.dataObject.PointInTriangle(point))
     {
@@ -125,7 +130,7 @@ vector<Triangle> RTree::Search(pair<double, double> point, const RTreeNode &node
     return result;
 }
 
-void RTree::Insert(Triangle triangle)
+void RTree::Insert(Triangle &triangle)
 {
     BR triangleBounds = MBR_of_triangle(triangle);
     // Find the leaf node where the point should be inserted
@@ -137,11 +142,11 @@ void RTree::Insert(Triangle triangle)
     leaf->children.push_back(newNode);
     m_dataNumber++;
     // Update the bounding box for the leaf node to include the new point
-    AdjustTree(path);
+    AdjustTree(path, triangleBounds);
 }
 
 // Returns a vector starting from the root to the leaf
-RTreeNode *RTree::ChooseLeaf(BR triangleBounds, vector<RTreeNode *> &path) const
+RTreeNode *RTree::ChooseLeaf(BR &triangleBounds, vector<RTreeNode *> &path) const
 {
     RTreeNode *node = root_; // Start at the root of the tree
     path.push_back(node); // We keep track of each node visited starting with the root node
@@ -283,7 +288,7 @@ void RTree::PickSeeds(const RTreeNode *node, RTreeNode *&entry1, RTreeNode *&ent
     entry2 = resultRightNode;
 }
 
-RTreeNode *RTree::PickNext(const vector<RTreeNode *> &entries, BR bounds1, BR bounds2, double &areaDiff) const
+RTreeNode *RTree::PickNext(const vector<RTreeNode *> &entries, BR &bounds1, BR &bounds2, double &areaDiff) const
 {
     double max_areaIncreaseDiff = -INFINITY;
     RTreeNode *max_entry;
@@ -302,7 +307,7 @@ RTreeNode *RTree::PickNext(const vector<RTreeNode *> &entries, BR bounds1, BR bo
     return max_entry;
 }
 
-void RTree::AdjustTree(vector<RTreeNode *> &path)
+void RTree::AdjustTree(vector<RTreeNode *> &path, const BR &newBR)
 {
     // From leaf to root
     while (!path.empty())
@@ -325,13 +330,11 @@ void RTree::AdjustTree(vector<RTreeNode *> &path)
                 path.push_back(root_);
                 m_depth++;
             }
-            // node was deleted by SplitNode, no need to change its bounds
+            // node's bounds were already updated by SplitNode
             continue;
         }
 
-        node->bounds = {};
-        for (const auto &child : node->children)
-            node->bounds = CalculateBounds(node->bounds, child->bounds);
+        node->bounds = CalculateBounds(node->bounds, newBR);
     }
 }
 
