@@ -146,7 +146,7 @@ public:
      */
     vector<Triangle> search(const pair<double, double> &point) const;
 
-    const int m_m = 2, m_M = 5; ///< Minimum and maximum number of children allowed for each node.
+    const int m_m = 2, m_M = 7; ///< Minimum and maximum number of children allowed for each node.
     int m_depth = 1, m_dataNumber = 0; ///< Depth and number of stored data of the tree.
 
 private:

@@ -9,7 +9,6 @@ Triangle::Triangle(const double x0, const double y0, double x1, double y1, doubl
 
 bool Triangle::pointInTriangle(const pair<double, double> &point) const
 {
-    // Checks if a point is within a triangle's bounds
     double tx0 = this->vertex0.first, ty0 = this->vertex0.second;
     double tx1 = this->vertex1.first, ty1 = this->vertex1.second;
     double tx2 = this->vertex2.first, ty2 = this->vertex2.second;
@@ -27,35 +26,11 @@ double Triangle::Area() const
     return .5 * abs(vertex0.first * (vertex1.second - vertex2.second) + vertex1.first * (vertex2.second - vertex0.second) + vertex2.first * (vertex0.second - vertex1.second));
 }
 
-ostream &operator<<(ostream &os, const Triangle &triangle)
-{
-    return os << "Vertex0: (" << triangle.vertex0.first
-              << ", " << triangle.vertex0.second << ")" << endl
-              << "Vertex1: (" << triangle.vertex1.first
-              << ", " << triangle.vertex1.second << ")" << endl
-              << "Vertex2: (" << triangle.vertex2.first
-              << ", " << triangle.vertex2.second << ")" << endl;
-}
-
-ostream &operator<<(ostream &os, const BR &b)
-{
-    for (int i = 0; i < b.size(); i++)
-    {
-        os << "Interval in dimension " << i << ": [" << b[i].first << ", " << b[i].second << "]" << endl;
-    }
-    return os;
-}
-
-ostream &operator<<(ostream &os, const RTree &tree)
-{
-    return os << "L'arbre de paramètres (m, M) = (" << tree.m_m << ", " << tree.m_M << ") contient " << tree.m_dataNumber << " objets et a une hauteur de " << tree.m_depth << endl;
-}
-
 RTreeNode::RTreeNode(NodeType nodeType) : nodeType(nodeType) {}
 
 RTreeNode::RTreeNode(const Triangle &dataObject, const BR &dataBounds) : nodeType(DATA), dataObject(dataObject), bounds(dataBounds) {}
 
-bool PointInBounds(pair<double, double> point, BR bounds)
+static bool PointInBounds(pair<double, double> point, BR bounds)
 {
     return bounds[0].first <= point.first && point.first <= bounds[0].second && bounds[1].first <= point.second && point.second <= bounds[1].second;
 }
@@ -69,7 +44,7 @@ RTreeNode::~RTreeNode()
 
 /**
  * @brief Calculates the minimum bounding rectangle of the given triangle.
- * 
+ *
  * @param triangle Triangle whose bounding rectangle is calculated.
  * @return BR Minimum bounding rectangle.
  */
@@ -114,18 +89,17 @@ vector<Triangle> RTree::search(const pair<double, double> &point) const
 
 vector<Triangle> RTree::search(const pair<double, double> &point, const RTreeNode &node) const
 {
+    // Stopping condition
     if (node.nodeType == DATA && node.dataObject.pointInTriangle(point))
-    {
         return {node.dataObject};
-    }
-
-    vector<Triangle> result = {};
 
     for (const auto &child : node.children)
     {
+        // Visit child if the point fits in its bounding rectangle
         if (PointInBounds(point, child->bounds))
         {
             vector<Triangle> v = this->search(point, *child);
+            
             // If a triangle is already found we stop searching (if we're interested in searching all triangles then remove this if statement and uncomment the line right after)
             if (!v.empty())
                 return v;
@@ -133,7 +107,7 @@ vector<Triangle> RTree::search(const pair<double, double> &point, const RTreeNod
         }
     }
 
-    return result;
+    return {};
 }
 
 void RTree::insert(const Triangle &triangle)
@@ -147,15 +121,14 @@ void RTree::insert(const Triangle &triangle)
     RTreeNode *newNode = new RTreeNode(triangle, triangleBounds);
     leaf->children.push_back(newNode);
     m_dataNumber++;
-    // Update the bounding box for the leaf node to include the new point
+    // Update the bounding box for the leaf node to include the new point and split parent nodes if needed
     adjustTree(path, triangleBounds);
 }
 
-// Returns a vector starting from the root to the leaf
 RTreeNode *RTree::chooseLeaf(const BR &triangleBounds, vector<RTreeNode *> &path) const
 {
     RTreeNode *node = root_; // Start at the root of the tree
-    path.push_back(node); // We keep track of each node visited starting with the root node
+    path.push_back(node);    // We keep track of each node visited starting with the root node
 
     while (node->nodeType == INTERNAL)
     {
@@ -178,11 +151,17 @@ RTreeNode *RTree::chooseLeaf(const BR &triangleBounds, vector<RTreeNode *> &path
         node = min_child;
         path.push_back(node);
     }
-    if (node->nodeType != LEAF) return nullptr;
+
+    // Checks if something wrong happened
+    if (node->nodeType != LEAF)
+    {
+        cout << "chooseLeaf didn't find a leaf." << endl;
+        return nullptr;
+    }
     return node;
 }
 
-void RTree::splitNode(RTreeNode * const parentNode, RTreeNode *node)
+void RTree::splitNode(RTreeNode *const parentNode, RTreeNode *node)
 {
     // Choose the two entries to be the first elements of the groups
     RTreeNode *seed1, *seed2;
@@ -200,7 +179,7 @@ void RTree::splitNode(RTreeNode * const parentNode, RTreeNode *node)
     node->children.erase(remove(node->children.begin(), node->children.end(), seed2), node->children.end());
 
     while (!node->children.empty())
-    {   
+    {
         // If one group has so few entries that all the rest must be assigned to it in order for it to have the minimum number m_m, assign them and stop
         if (node->children.size() + node1->children.size() <= m_m)
         {
@@ -224,12 +203,13 @@ void RTree::splitNode(RTreeNode * const parentNode, RTreeNode *node)
             break;
         }
 
-        // Choose next entry to assign
+        // Choose next entry to assign to a group
         double areaDiff;
         RTreeNode *entry = pickNext(node->children, node1->bounds, node2->bounds, areaDiff);
 
         double area1 = calculateBoundsArea(node1->bounds),
                area2 = calculateBoundsArea(node2->bounds);
+        // Add entry to the group whose covering rectangle will have to be enlarged least to accomodate it. Resolve ties by adding the entry to the group with smaller area, then to the one with fewer entries, then to either.
         if (areaDiff > 0 || (areaDiff == 0 && area1 < area2) || (area1 == area2 && node1->children.size() <= node2->children.size()))
         {
             node1->children.push_back(entry);
@@ -240,18 +220,18 @@ void RTree::splitNode(RTreeNode * const parentNode, RTreeNode *node)
             node2->children.push_back(entry);
             node2->bounds = calculateBounds(node2->bounds, entry->bounds);
         }
+        // Removes entry from remaining entries
         node->children.erase(remove(node->children.begin(), node->children.end(), entry), node->children.end());
     }
 
-    // Make the original node an internal node and add the two new nodes as its children
-    // node->nodeType = INTERNAL;
+    // Make node1 and node2 the only children of parentNode
     parentNode->children.erase(remove(parentNode->children.begin(), parentNode->children.end(), node), parentNode->children.end());
     delete node;
     parentNode->children.push_back(node1);
     parentNode->children.push_back(node2);
 }
 
-void RTree::pickSeeds(const RTreeNode * const node, RTreeNode *&entry1, RTreeNode *&entry2) const
+void RTree::pickSeeds(const RTreeNode *const node, RTreeNode *&entry1, RTreeNode *&entry2) const
 {
     // Along each dimension, find the entry whose rectangle has the highest low side, and the one with the lowest high side.
     RTreeNode *resultLeftNode;
@@ -259,15 +239,15 @@ void RTree::pickSeeds(const RTreeNode * const node, RTreeNode *&entry1, RTreeNod
     double normalizedSep = -INFINITY;
     for (int i = 0; i < node->bounds.size(); i++)
     {
+        // Lowest high side
         entry1 = node->children[0];
         for (const auto &child : node->children)
         {
             if (child->bounds[i].second < entry1->bounds[i].second)
-            {
                 entry1 = child;
-            }
         }
 
+        // Highest low side from remaining entries
         entry2 = entry1 != node->children[0] ? node->children[0] : node->children[1];
         for (const auto &child : node->children)
         {
@@ -275,9 +255,7 @@ void RTree::pickSeeds(const RTreeNode * const node, RTreeNode *&entry1, RTreeNod
                 continue;
 
             if (child->bounds[i].first > entry2->bounds[i].first)
-            {
                 entry2 = child;
-            }
         }
 
         // Normalize the separations by dividing by the width of the entire set along the corresponding dimension
@@ -345,12 +323,12 @@ void RTree::adjustTree(vector<RTreeNode *> &path, const BR &newBR)
     }
 }
 
-// Merge two bounds together
 BR RTree::calculateBounds(const BR &bounds1, const BR &bounds2) const
 {
-    if (bounds1.size() == 0)
+    // If one bounding box is empty return the other one
+    if (bounds1.empty())
         return bounds2;
-    if (bounds2.size() == 0)
+    if (bounds2.empty())
         return bounds1;
 
     double min_x = min(bounds1[0].first, bounds2[0].first);
@@ -374,6 +352,32 @@ double RTree::calculateAreaCost(const BR &bounds1, const BR &boundsOfInsertedNod
 
     // Area when adding new node
     BR newBounds = calculateBounds(bounds1, boundsOfInsertedNode);
+
     // Difference between new area and initial area
     return calculateBoundsArea(newBounds) - area;
+}
+
+// Operator overloading
+ostream &operator<<(ostream &os, const Triangle &triangle)
+{
+    return os << "Vertex0: (" << triangle.vertex0.first
+              << ", " << triangle.vertex0.second << ")" << endl
+              << "Vertex1: (" << triangle.vertex1.first
+              << ", " << triangle.vertex1.second << ")" << endl
+              << "Vertex2: (" << triangle.vertex2.first
+              << ", " << triangle.vertex2.second << ")" << endl;
+}
+
+ostream &operator<<(ostream &os, const BR &b)
+{
+    for (int i = 0; i < b.size(); i++)
+    {
+        os << "Interval in dimension " << i << ": [" << b[i].first << ", " << b[i].second << "]" << endl;
+    }
+    return os;
+}
+
+ostream &operator<<(ostream &os, const RTree &tree)
+{
+    return os << "L'arbre de paramètres (m, M) = (" << tree.m_m << ", " << tree.m_M << ") contient " << tree.m_dataNumber << " objets et a une hauteur de " << tree.m_depth << endl;
 }

@@ -69,7 +69,9 @@ void readFile(ifstream &stream, vector<double> &coords, map<pair<double, double>
         stream >> geo_coord.lpzt.phi >> geo_coord.lpzt.lam >> alt;
         geo_coord.lpzt.z = 0.;
 
+        // Convert to cartesian coords
         cartesian_coord = proj_trans(P, PJ_FWD, geo_coord);
+        // Add cartesian coords to containers
         coords.push_back(cartesian_coord.xy.x);
         coords.push_back(cartesian_coord.xy.y);
         pair<double, double> xy = make_pair(cartesian_coord.xy.x, cartesian_coord.xy.y);
@@ -88,12 +90,13 @@ void readFile(ifstream &stream, vector<double> &coords, map<pair<double, double>
  */
 void insertTriangles(const delaunator::Delaunator &d, RTree &tree, double areaFilter = INFINITY)
 {
+    // Counter variable
     int nbSkipped = 0;
 
     cout << "Taux de triangles insérés dans l'arbre :" << endl;
     for (int i = 0; i < d.triangles.size(); i += 3)
-    // for (int i = 0; i < 102; i += 3)
     {
+        // Triangle's vertices coordinates
         const double x0 = d.coords[2 * d.triangles[i]],
                      y0 = d.coords[2 * d.triangles[i] + 1],
                      x1 = d.coords[2 * d.triangles[i + 1]],
@@ -102,16 +105,19 @@ void insertTriangles(const delaunator::Delaunator &d, RTree &tree, double areaFi
                      y2 = d.coords[2 * d.triangles[i + 2] + 1];
 
         const Triangle triangle(x0, y0, x1, y1, x2, y2);
+
+        // Don't insert triangle if area is above areaFilter
         const double area = triangle.Area();
         if (0 < area && area <= areaFilter)
             tree.insert(triangle);
-
         else
             nbSkipped++;
 
+        // Update progress bar 100 times during the whole process
         if (d.triangles.size() / 300 == 0 || i % (d.triangles.size() / 300) == (d.triangles.size() - 3) % (d.triangles.size() / 300))
             progressBar((double)(i + 3) / d.triangles.size());
     }
+
     cout << "Nombre de triangles supprimés car trop larges : " << nbSkipped << "/" << d.triangles.size() / 3 << endl;
 }
 
@@ -149,6 +155,7 @@ double calculateAltitudes(const pair<double, double> &point, const Triangle &tri
 BR getMBR(const vector<double> &coords, const map<pair<double, double>, double> &altitudes)
 {
     double min_x = INFINITY, min_y = INFINITY, max_x = 0, max_y = 0;
+    // x dimension
     for (int i = 0; i < coords.size(); i += 2)
     {
         if (coords[i] <= min_x)
@@ -158,6 +165,7 @@ BR getMBR(const vector<double> &coords, const map<pair<double, double>, double> 
             max_x = coords[i];
     }
 
+    // y dimension
     for (int i = 1; i < coords.size(); i += 2)
     {
         if (coords[i] <= min_y)
@@ -167,6 +175,7 @@ BR getMBR(const vector<double> &coords, const map<pair<double, double>, double> 
             max_y = coords[i];
     }
 
+    // z dimension
     const double min_z = min_element(altitudes.begin(), altitudes.end(), [](const auto &x, const auto &y)
                                      { return x.second < y.second; })
                              ->second;
@@ -194,11 +203,13 @@ double hillShading(const Triangle &triangle, double z0, double z1, double z2, do
     const double azimuth_math = fmod(360 - azimut_deg + 90, 360);
     const double azimuth_rad = azimuth_math * M_PI / 180;
 
-    double neighs[9]; // 9 neighbor cells starting with vertex (x0, y0, z0)
+    double neighs[9]; // Altitudes of arbitrary point and of 8 neighbors
     for (int i = 0; i < 9; i++)
     {
         neighs[i] = calculateAltitudes(make_pair(triangle.vertex0.first + i % 3, triangle.vertex0.second + i / 3), triangle, z0, z1, z2);
     }
+
+    // Calculate derivatives dz/dx and dz/dy
     const double dz_dx = ((neighs[2] + 2 * neighs[5] + neighs[8]) - (neighs[0] + 2 * neighs[3] + neighs[6])) / 8,
                  dz_dy = ((neighs[6] + 2 * neighs[7] + neighs[8]) - (neighs[0] + 2 * neighs[1] + neighs[2])) / 8;
 
@@ -219,11 +230,14 @@ double hillShading(const Triangle &triangle, double z0, double z1, double z2, do
  */
 void createRaster(ofstream &f, const RTree &tree, const map<pair<double, double>, double> &altitudes, const BR &rasterBounds, int w)
 {
+    // RGB color of points belonging to no triangles
     const int backgroundColor = 0;
+    // Sun's position for hill shading
     const float azimut_deg = 315, altitude_deg = 35;
 
-    const int h = w * (rasterBounds[1].second - rasterBounds[1].first) /
-                  (rasterBounds[0].second - rasterBounds[0].first);
+    // Height of raster based on width and bounds
+    const int h = w * (rasterBounds[1].second - rasterBounds[1].first) / (rasterBounds[0].second - rasterBounds[0].first);
+
     printf("Génération de l'image en taille : (%d, %d)\n", w, h);
     // File characteristics
     f << "P6" << endl
@@ -238,6 +252,7 @@ void createRaster(ofstream &f, const RTree &tree, const map<pair<double, double>
     min_z = rasterBounds[2].first;
     max_z = rasterBounds[2].second;
 
+    // Steps in following for loops
     const double x_step = (max_x - min_x) / w;
     const double y_step = (max_y - min_y) / h;
 
@@ -247,7 +262,10 @@ void createRaster(ofstream &f, const RTree &tree, const map<pair<double, double>
         x = min_x;
         for (int j = 0; j < w; j++)
         {
+            // Search triangle in tree
             vector<Triangle> resultSearch = tree.search(make_pair(x, y));
+
+            // Use background color if no triangle found
             if (resultSearch.empty())
             {
                 f << (char)backgroundColor
@@ -265,12 +283,15 @@ void createRaster(ofstream &f, const RTree &tree, const map<pair<double, double>
             double z2 = altitudes.find(triangle.vertex2)->second;
 
             double z = calculateAltitudes(make_pair(x, y), triangle, z0, z1, z2);
+
             int hueValue = (max_z - z) * 360 / (max_z - min_z);
 
             int r, g, b;
             double lum = hillShading(triangle, z0, z1, z2, azimut_deg, altitude_deg);
+            
             HSLToRGB(hueValue, .5f, lum, r, g, b);
 
+            // Sends values to the stream as binary data
             f << (char)max(r, 0)
               << (char)max(g, 0)
               << (char)max(b, 0);
@@ -285,23 +306,29 @@ void createRaster(ofstream &f, const RTree &tree, const map<pair<double, double>
 
 int main(int argc, char const *argv[])
 {
+    // Checks number of arguments
     if (argc < 3)
     {
         printf("Not enough arguments.\n");
         return -1;
     }
 
-    const int imageWidth = stoi(argv[2]); // Image size
+    // Image size
+    const int imageWidth = stoi(argv[2]);
+    // Filename of input data
     const string filename = "../data/" + (string)argv[1];
     ifstream f_data(filename);
 
+    // Vector storing x and y values
     vector<double> coords;
+    // Map associating (x,y) pairs to their corresponding z value
     map<pair<double, double>, double> altitudes;
 
     if (!f_data.is_open())
         cout << "Erreur d'ouverture de " << filename << endl;
     else
     {
+        // Fill coords and altitudes containers using data from f_data
         readFile(f_data, coords, altitudes);
         f_data.close();
     }
@@ -309,9 +336,10 @@ int main(int argc, char const *argv[])
     // Triangulation
     delaunator::Delaunator d(coords);
 
-    // Insertion of the triangles in a R-Tree
+    // Creates the R-Tree
     RTree tree(2, 7);
 
+    // Inserts the delaunay triangles in the tree with an area filter depending on the data
     if (filename == "../data/rade_1m_IM.txt")
         insertTriangles(d, tree, .6);
     else if (filename == "../data/Guerledan_Feb19_50cm_wgs84.txt")
@@ -324,14 +352,18 @@ int main(int argc, char const *argv[])
     // Create raster
     const string raster = filename.substr(8, filename.size() - 12);
     const string outputFilename = "../data/generated/" + raster + ".ppm";
+
     ofstream f(outputFilename);
+
     if (!f.is_open())
         cout << "Erreur d'ouverture de " << outputFilename << endl;
+
     else
     {
         const BR rasterBounds = getMBR(d.coords, altitudes);
         createRaster(f, tree, altitudes, rasterBounds, imageWidth);
     }
+    
     f.close();
 
     cout << "finished..." << endl;

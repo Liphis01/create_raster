@@ -16,10 +16,12 @@ void RGBToHSL(int R, int G, int B, int &H, int &S, double &L)
 	double g = (G / 255.0f);
 	double b = (B / 255.0f);
 
+	// Calcul la composante RGB la plus faible et la plus élevée et en déduit la différence
 	double min = Min(Min(r, g), b);
 	double max = Max(Max(r, g), b);
 	double delta = max - min;
 
+	// Moyenne de min et max
 	L = (max + min) / 2;
 
 	if (delta == 0)
@@ -31,20 +33,15 @@ void RGBToHSL(int R, int G, int B, int &H, int &S, double &L)
 	{
 		S = (L <= 0.5) ? (delta / (max + min)) : (delta / (2 - max - min));
 
+		// Calcul de hue
 		double hue;
 
 		if (r == max)
-		{
 			hue = ((g - b) / 6) / delta;
-		}
 		else if (g == max)
-		{
 			hue = (1.0f / 3) + ((b - r) / 6) / delta;
-		}
 		else
-		{
 			hue = (2.0f / 3) + ((r - g) / 6) / delta;
-		}
 
 		if (hue < 0)
 			hue += 1;
@@ -80,14 +77,13 @@ double hueToRGB(double v1, double v2, double vH)
 void HSLToRGB(int H, double S, double L, int &r, int &g, int &b)
 {
 	if (S == 0)
-	{
 		r = g = b = (int)(L * 255);
-	}
 	else
 	{
 		double v1, v2;
 		double hue = (double)H / 360;
 
+		// Intermediate values
 		v2 = (L < 0.5) ? (L * (1 + S)) : ((L + S) - (L * S));
 		v1 = 2 * L - v2;
 
