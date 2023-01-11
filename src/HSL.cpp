@@ -1,3 +1,10 @@
+/**
+ * @file HSL.cpp
+ * @author Louis Gillard (louis.gillard@ensta-bretagne.org)
+ * @version 0.1
+ * @date 2023-01-11
+ */
+
 #include "HSL.h"
 
 static double Min(double a, double b)

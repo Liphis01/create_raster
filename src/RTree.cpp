@@ -1,3 +1,10 @@
+/**
+ * @file RTree.cpp
+ * @author Louis Gillard (louis.gillard@ensta-bretagne.org)
+ * @version 0.1
+ * @date 2023-01-11
+ */
+
 #include <cmath>
 #include "RTree.h"
 
@@ -30,7 +37,7 @@ RTreeNode::RTreeNode(NodeType nodeType) : nodeType(nodeType) {}
 
 RTreeNode::RTreeNode(const Triangle &dataObject, const BR &dataBounds) : nodeType(DATA), dataObject(dataObject), bounds(dataBounds) {}
 
-static bool PointInBounds(pair<double, double> point, BR bounds)
+static bool pointInBounds(pair<double, double> point, BR bounds)
 {
     return bounds[0].first <= point.first && point.first <= bounds[0].second && bounds[1].first <= point.second && point.second <= bounds[1].second;
 }
@@ -96,7 +103,7 @@ vector<Triangle> RTree::search(const pair<double, double> &point, const RTreeNod
     for (const auto &child : node.children)
     {
         // Visit child if the point fits in its bounding rectangle
-        if (PointInBounds(point, child->bounds))
+        if (pointInBounds(point, child->bounds))
         {
             vector<Triangle> v = this->search(point, *child);
             

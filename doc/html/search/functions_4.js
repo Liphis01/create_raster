@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['search_32',['search',['../classRTree.html#a7f512a6db3f0a37c8b342f19189a7017',1,'RTree']]]
+  ['insert_41',['insert',['../classRTree.html#ad2cbd2067e571df9851e239194a0d030',1,'RTree']]],
+  ['inserttriangles_42',['insertTriangles',['../main_8cpp.html#a64b5b048a7c6a24517c67a5e30c43b55',1,'main.cpp']]]
 ];

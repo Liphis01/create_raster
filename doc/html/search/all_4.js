@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['insert_7',['insert',['../classRTree.html#ad2cbd2067e571df9851e239194a0d030',1,'RTree']]]
+  ['getmbr_9',['getMBR',['../main_8cpp.html#a4b24c49594f5e1eccd446cf6b74cf04c',1,'main.cpp']]]
 ];

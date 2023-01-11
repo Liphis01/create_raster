@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['_7ertree_19',['~RTree',['../classRTree.html#a1e27473bad4be63f3b40ee370e6ce915',1,'RTree']]],
-  ['_7ertreenode_20',['~RTreeNode',['../structRTreeNode.html#a9d4bfb8959cf1c48a3d779d974244bc2',1,'RTreeNode']]]
+  ['triangle_23',['Triangle',['../structTriangle.html',1,'Triangle'],['../structTriangle.html#aaefe4ed500c07918d30c6f0e286332c5',1,'Triangle::Triangle()'],['../structTriangle.html#a666b4ca158f72744dc082efeeb603375',1,'Triangle::Triangle(double x0, double y0, double x1, double y1, double x2, double y2)']]]
 ];

@@ -1,0 +1,180 @@
+\hypertarget{main_8cpp}{}\doxysection{src/main.cpp File Reference}
+\label{main_8cpp}\index{src/main.cpp@{src/main.cpp}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+{\ttfamily \#include $<$proj.\+h$>$}\newline
+{\ttfamily \#include $<$map$>$}\newline
+{\ttfamily \#include \char`\"{}delaunator.\+hpp\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}R\+Tree.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}H\+S\+L.\+h\char`\"{}}\newline
+Include dependency graph for main.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{main_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{main_8cpp_a4065075e9efa4dd12383611d6f2860a1}{progress\+Bar}} (double progress)
+\item 
+void \mbox{\hyperlink{main_8cpp_a65980bb2e4dfe682cf9e46339f10e4a8}{read\+File}} (ifstream \&stream, vector$<$ double $>$ \&coords, map$<$ pair$<$ double, double $>$, double $>$ \&altitudes)
+\item 
+void \mbox{\hyperlink{main_8cpp_a64b5b048a7c6a24517c67a5e30c43b55}{insert\+Triangles}} (const \mbox{\hyperlink{classdelaunator_1_1Delaunator}{delaunator\+::\+Delaunator}} \&d, \mbox{\hyperlink{classRTree}{R\+Tree}} \&tree, double area\+Filter=I\+N\+F\+I\+N\+I\+TY)
+\item 
+double \mbox{\hyperlink{main_8cpp_ab0a1a36e6fe2655839e3a431705d8f36}{calculate\+Altitudes}} (const pair$<$ double, double $>$ \&point, const \mbox{\hyperlink{structTriangle}{Triangle}} \&triangle, double z0, double z1, double z2)
+\item 
+BR \mbox{\hyperlink{main_8cpp_a4b24c49594f5e1eccd446cf6b74cf04c}{get\+M\+BR}} (const vector$<$ double $>$ \&coords, const map$<$ pair$<$ double, double $>$, double $>$ \&altitudes)
+\item 
+double \mbox{\hyperlink{main_8cpp_ab68ff526f3056a01d0da39148be80e28}{hill\+Shading}} (const \mbox{\hyperlink{structTriangle}{Triangle}} \&triangle, double z0, double z1, double z2, double azimut\+\_\+deg=315., double altitude\+\_\+deg=45.)
+\item 
+void \mbox{\hyperlink{main_8cpp_ab5abe0a55da43c4ef2766c5263e2b2d7}{create\+Raster}} (ofstream \&f, const \mbox{\hyperlink{classRTree}{R\+Tree}} \&tree, const map$<$ pair$<$ double, double $>$, double $>$ \&altitudes, const BR \&raster\+Bounds, int w)
+\item 
+\mbox{\Hypertarget{main_8cpp_abf9e6b7e6f15df4b525a2e7705ba3089}\label{main_8cpp_abf9e6b7e6f15df4b525a2e7705ba3089}} 
+int {\bfseries main} (int argc, char const $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+Louis Gillard (\href{mailto:louis.gillard@ensta-bretagne.org}{\texttt{ louis.\+gillard@ensta-\/bretagne.\+org}}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2023-\/01-\/11 
+\end{DoxyDate}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8cpp_ab0a1a36e6fe2655839e3a431705d8f36}\label{main_8cpp_ab0a1a36e6fe2655839e3a431705d8f36}} 
+\index{main.cpp@{main.cpp}!calculateAltitudes@{calculateAltitudes}}
+\index{calculateAltitudes@{calculateAltitudes}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{calculateAltitudes()}{calculateAltitudes()}}
+{\footnotesize\ttfamily double calculate\+Altitudes (\begin{DoxyParamCaption}\item[{const pair$<$ double, double $>$ \&}]{point,  }\item[{const \mbox{\hyperlink{structTriangle}{Triangle}} \&}]{triangle,  }\item[{double}]{z0,  }\item[{double}]{z1,  }\item[{double}]{z2 }\end{DoxyParamCaption})}
+
+Given a 3D-\/triangle and a x,y-\/point, returns the z coordinate of the point (x,y,z) belonging to the triangle.
+
+
+\begin{DoxyParams}{Parameters}
+{\em point} & x and y coordinates. \\
+\hline
+{\em triangle} & 2D triangle. \\
+\hline
+{\em z0,z1,z2} & z-\/coordinates of the 3 vertices of the 2D triangle. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+z-\/ccordinate of the point belonging to the 3D triangle. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8cpp_ab5abe0a55da43c4ef2766c5263e2b2d7}\label{main_8cpp_ab5abe0a55da43c4ef2766c5263e2b2d7}} 
+\index{main.cpp@{main.cpp}!createRaster@{createRaster}}
+\index{createRaster@{createRaster}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{createRaster()}{createRaster()}}
+{\footnotesize\ttfamily void create\+Raster (\begin{DoxyParamCaption}\item[{ofstream \&}]{f,  }\item[{const \mbox{\hyperlink{classRTree}{R\+Tree}} \&}]{tree,  }\item[{const map$<$ pair$<$ double, double $>$, double $>$ \&}]{altitudes,  }\item[{const BR \&}]{raster\+Bounds,  }\item[{int}]{w }\end{DoxyParamCaption})}
+
+Creates the raster.
+
+
+\begin{DoxyParams}{Parameters}
+{\em f} & Stream in which data is written. \\
+\hline
+{\em tree} & R-\/\+Tree in which all the delaunay triangles are sorted. \\
+\hline
+{\em altitudes} & Stores the altitudes of all the measurements. \\
+\hline
+{\em raster\+Bounds} & Bounding area of all the measured points. \\
+\hline
+{\em w} & Width in pixels of the raster. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8cpp_a4b24c49594f5e1eccd446cf6b74cf04c}\label{main_8cpp_a4b24c49594f5e1eccd446cf6b74cf04c}} 
+\index{main.cpp@{main.cpp}!getMBR@{getMBR}}
+\index{getMBR@{getMBR}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{getMBR()}{getMBR()}}
+{\footnotesize\ttfamily BR get\+M\+BR (\begin{DoxyParamCaption}\item[{const vector$<$ double $>$ \&}]{coords,  }\item[{const map$<$ pair$<$ double, double $>$, double $>$ \&}]{altitudes }\end{DoxyParamCaption})}
+
+Returns the minimum bounding rectangle of all the points given.
+
+
+\begin{DoxyParams}{Parameters}
+{\em coords} & x and y coordinates of the points. \\
+\hline
+{\em altitudes} & Map object which gives the altitude for each (x,y) pair. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Minimum bounding rectangle of all the points. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8cpp_ab68ff526f3056a01d0da39148be80e28}\label{main_8cpp_ab68ff526f3056a01d0da39148be80e28}} 
+\index{main.cpp@{main.cpp}!hillShading@{hillShading}}
+\index{hillShading@{hillShading}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{hillShading()}{hillShading()}}
+{\footnotesize\ttfamily double hill\+Shading (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structTriangle}{Triangle}} \&}]{triangle,  }\item[{double}]{z0,  }\item[{double}]{z1,  }\item[{double}]{z2,  }\item[{double}]{azimut\+\_\+deg = {\ttfamily 315.},  }\item[{double}]{altitude\+\_\+deg = {\ttfamily 45.} }\end{DoxyParamCaption})}
+
+Calculates the luminosity of a triangle to make a more realistic raster with shaded areas.
+
+
+\begin{DoxyParams}{Parameters}
+{\em triangle} & \mbox{\hyperlink{structTriangle}{Triangle}} whose luminosity is being calculated. \\
+\hline
+{\em z0,z1,z2} & z-\/coordinates of the 3 vertices of the 2D triangle. \\
+\hline
+{\em azimut\+\_\+deg} & Angular direction of the sun, measured from north in clockwise degrees from 0 to 360. An azimuth of 90 degrees is east. The default azimuth is 315 degrees (NW). \\
+\hline
+{\em alititude\+\_\+deg} & Slope or angle of the illumination source above the horizon. The units are in degrees, from 0 (on the horizon) to 90 (overhead). The default is 45 degrees. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Luminosity of the triangle mesh. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{main_8cpp_a64b5b048a7c6a24517c67a5e30c43b55}\label{main_8cpp_a64b5b048a7c6a24517c67a5e30c43b55}} 
+\index{main.cpp@{main.cpp}!insertTriangles@{insertTriangles}}
+\index{insertTriangles@{insertTriangles}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{insertTriangles()}{insertTriangles()}}
+{\footnotesize\ttfamily void insert\+Triangles (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classdelaunator_1_1Delaunator}{delaunator\+::\+Delaunator}} \&}]{d,  }\item[{\mbox{\hyperlink{classRTree}{R\+Tree}} \&}]{tree,  }\item[{double}]{area\+Filter = {\ttfamily INFINITY} }\end{DoxyParamCaption})}
+
+Insert all triangles generated by the Delaunator library into the R-\/\+Tree.
+
+
+\begin{DoxyParams}{Parameters}
+{\em d} & Delaunator object where all the triangles are stored. \\
+\hline
+{\em tree} & R-\/\+Tree in which the triangles will be inserted. \\
+\hline
+{\em area\+Filter} & Threshold above which triangles aren\textquotesingle{}t inserted in the Tree. Equals I\+N\+F\+I\+N\+I\+TY by default, meaning all triangles are inserted. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8cpp_a4065075e9efa4dd12383611d6f2860a1}\label{main_8cpp_a4065075e9efa4dd12383611d6f2860a1}} 
+\index{main.cpp@{main.cpp}!progressBar@{progressBar}}
+\index{progressBar@{progressBar}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{progressBar()}{progressBar()}}
+{\footnotesize\ttfamily void progress\+Bar (\begin{DoxyParamCaption}\item[{double}]{progress }\end{DoxyParamCaption})}
+
+Prints a progression bar on the console.
+
+
+\begin{DoxyParams}{Parameters}
+{\em progress} & Progress of the process. Value between 0 when not started and 1 when finished. \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{main_8cpp_a65980bb2e4dfe682cf9e46339f10e4a8}\label{main_8cpp_a65980bb2e4dfe682cf9e46339f10e4a8}} 
+\index{main.cpp@{main.cpp}!readFile@{readFile}}
+\index{readFile@{readFile}!main.cpp@{main.cpp}}
+\doxysubsubsection{\texorpdfstring{readFile()}{readFile()}}
+{\footnotesize\ttfamily void read\+File (\begin{DoxyParamCaption}\item[{ifstream \&}]{stream,  }\item[{vector$<$ double $>$ \&}]{coords,  }\item[{map$<$ pair$<$ double, double $>$, double $>$ \&}]{altitudes }\end{DoxyParamCaption})}
+
+Reads the given file or stream and outputs the coordinates.
+
+
+\begin{DoxyParams}{Parameters}
+{\em stream} & File or stream to be read. \\
+\hline
+{\em coords} & Vector storing the x and y coordinates. \\
+\hline
+{\em altitudes} & Map that binds a (x,y) pair to the corresponding altitude. \\
+\hline
+\end{DoxyParams}

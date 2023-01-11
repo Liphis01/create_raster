@@ -1,3 +1,10 @@
+/**
+ * @file main.cpp
+ * @author Louis Gillard (louis.gillard@ensta-bretagne.org)
+ * @version 0.1
+ * @date 2023-01-11
+ */
+
 #include <iostream>
 #include <fstream>
 #include <math.h>
@@ -316,7 +323,7 @@ int main(int argc, char const *argv[])
     // Image size
     const int imageWidth = stoi(argv[2]);
     // Filename of input data
-    const string filename = "../data/" + (string)argv[1];
+    const string filename = argv[1];
     ifstream f_data(filename);
 
     // Vector storing x and y values
@@ -351,7 +358,7 @@ int main(int argc, char const *argv[])
 
     // Create raster
     const string raster = filename.substr(8, filename.size() - 12);
-    const string outputFilename = "../data/generated/" + raster + ".ppm";
+    const string outputFilename = "/generated/" + raster + ".ppm";
 
     ofstream f(outputFilename);
 
