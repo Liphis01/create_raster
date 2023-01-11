@@ -11,8 +11,7 @@ Pour chaque pixel de l'image, nous devons calculer une couleur synthétisant les
 
 Pour en savoir plus sur le projet et comprendre comment il fonctionne, consulter les vidéos suivantes :
 
-* [Projet c++ (partie 1)](https://youtu.be/2aM5mAS5h8E)
-* [Projet c++ (partie 2)](https://youtu.be/OOjxNFTUEVw)
-* [Projet c++ (partie 3)](https://youtu.be/fPNIVG7IRXg)
+* [Projet c++ (partie 1)](https://youtu.be/_Kq2G5fgg1g)
+* [Projet c++ (partie 2)](https://youtu.be/kCxn59Li-B8)
 
 Ces vidéos expliquent la démarche et la structure du code.
