@@ -347,9 +347,9 @@ int main(int argc, char const *argv[])
     RTree tree(2, 7);
 
     // Inserts the delaunay triangles in the tree with an area filter depending on the data
-    if (filename == "../data/rade_1m_IM.txt")
+    if (filename == "rade_1m_IM.txt")
         insertTriangles(d, tree, .6);
-    else if (filename == "../data/Guerledan_Feb19_50cm_wgs84.txt")
+    else if (filename == "Guerledan_Feb19_50cm_wgs84.txt")
         insertTriangles(d, tree, .2);
     else
         insertTriangles(d, tree);
@@ -357,8 +357,8 @@ int main(int argc, char const *argv[])
     cout << tree << endl;
 
     // Create raster
-    const string raster = filename.substr(8, filename.size() - 12);
-    const string outputFilename = "/generated/" + raster + ".ppm";
+    const string raster = filename.substr(0, filename.size() - 4);
+    const string outputFilename = "../data/generated/" + raster + ".ppm";
 
     ofstream f(outputFilename);
 
